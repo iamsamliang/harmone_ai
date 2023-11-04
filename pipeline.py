@@ -6,6 +6,8 @@ from text_transcript import audio_to_text, store_transcription
 from extract_frames import extract_frames
 from image_captioning import get_captions, store_captions
 
+device = "mps"  # Apple GPU
+
 # download youtube video and audio separately
 yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"
 output_file = "test_yt"  # do not add extensions (.mp4, etc) here
@@ -14,7 +16,7 @@ vid_info = dl_video_audio(yt_url, output_file)
 # convert audio to text
 audio_file = output_file + "_audio.webm"
 json_path = "transcription.json"
-transcription = audio_to_text(audio_file)
+transcription = audio_to_text(audio_file, device_n=device)
 # Save as JSON
 with open(json_path, "w") as f:
     json.dump(transcription, f, indent=4)
@@ -32,7 +34,6 @@ image_dir = "frames"
 extract_frames(video_path, image_dir)
 
 # convert frames to captions
-device = "mps"  # Apple GPU
 captions = get_captions(image_dir, device)
 
 # Optional to save as intermediate step

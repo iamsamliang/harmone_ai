@@ -5,12 +5,13 @@ import cohere
 from uuid import uuid4
 
 
-def audio_to_text(audio_file):
+def audio_to_text(audio_file, device_n):
     # old way to extract audio
     # command = f"ffmpeg -i {video_file} -q:a 0 {output_file}"
     # subprocess.run(command, shell=True, check=True)
 
-    model = whisper.load_model("base")
+    # english only model for speed
+    model = whisper.load_model("base.en", device=device_n)
     result = model.transcribe(audio_file)  # mp3 or webm
 
     return result

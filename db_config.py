@@ -36,13 +36,5 @@ def add_data(engine, video: dict, captions: list[str]):
         session.commit()
 
 
-# def add_caption(engine, captions: list[str], vid_obj: Video):
-#     # Add caption data
-#     with Session(engine) as session:
-#         rows = []
-#         for time, caption in enumerate(captions):  # assume caption in order
-#             res = Caption(timestamp=(time + 1), caption=caption, video_id=vid_obj.id)
-#             rows.append(res)
-
-#         session.add_all(rows)
-#         session.commit()
+def get_captions(engine, video_id):
+    pass
