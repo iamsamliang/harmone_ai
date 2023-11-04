@@ -1,0 +1,35 @@
+from typing import List, Optional
+from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+class Video(Base):
+    __tablename__ = "videos"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(255))
+    url: Mapped[str] = mapped_column(Text)
+    author: Mapped[str] = mapped_column(String(255))
+    desc: Mapped[Optional[str]] = mapped_column(Text)
+    length: Mapped[int]
+
+    captions: Mapped[List["Caption"]] = relationship(cascade="all, delete")
+
+    def __repr__(self) -> str:
+        return f"Video(id={self.id!r}, title={self.title!r}, url={self.url!r}, author={self.author!r}, desc={self.desc!r}, length={self.length!r})"
+
+
+class Caption(Base):
+    __tablename__ = "captions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    timestamp: Mapped[int]
+    caption: Mapped[str] = mapped_column(Text)
+
+    video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
+
+    def __repr__(self) -> str:
+        return f"Caption(id={self.id!r}, timestamp={self.timestamp!r}, caption={self.caption!r}, video_id={self.video_id!r})"
