@@ -1,5 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:harmone_extension_f/screens/chat_history.dart';
+import 'package:js/js.dart';
+import 'package:harmone_extension_f/providers/url.dart';
+import 'package:provider/provider.dart';
+
+@JS()
+external void getCurrentTabUrl(void Function(String) callback);
+
+void requestCurrentTabUrl(BuildContext context) {
+  getCurrentTabUrl(allowInterop((String url) {
+    print('Current tab URL: $url');
+    Provider.of<Url>(context, listen: false).updateURL(url);
+  }));
+}
 
 class IntroPage extends StatefulWidget {
   const IntroPage({super.key});
@@ -27,15 +40,18 @@ class _IntroPageState extends State<IntroPage> {
               const Text(
                 'Meet Jessica, she is excited to meet you and watch this YouTube video with you',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,  // Centers the text within the Text widget
+                textAlign:
+                    TextAlign.center, // Centers the text within the Text widget
               ),
-              const SizedBox(height: 20),  // Adds spacing between the text and button
+              const SizedBox(
+                  height: 20), // Adds spacing between the text and button
               ElevatedButton(
                 onPressed: () {
+                  requestCurrentTabUrl(
+                      context); // pass context to requestCurrentTabUrl
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) =>
-                          const ChatHistoryPage(), 
+                      builder: (context) => const ChatHistoryPage(),
                     ),
                   );
                 },

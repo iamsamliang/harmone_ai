@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../providers/url.dart';
+import 'package:provider/provider.dart';
+
 
 class ChatHistoryPage extends StatefulWidget {
   const ChatHistoryPage({super.key});
@@ -8,9 +11,25 @@ class ChatHistoryPage extends StatefulWidget {
 }
 
 class _ChatHistoryPageState extends State<ChatHistoryPage> {
+
+
+  
+
   @override
   Widget build(BuildContext context) {
+
+  final urlProvider = Provider.of<Url>(context);
+  final currentUrl = urlProvider.url;
+
+
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          currentUrl,
+          style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -23,12 +42,6 @@ class _ChatHistoryPageState extends State<ChatHistoryPage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: <Widget>[
-              const Text(
-                'Chat History',
-                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
               Expanded(
                 child: ListView(
                   children: const <Widget>[
