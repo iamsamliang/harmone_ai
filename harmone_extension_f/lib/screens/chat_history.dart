@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../providers/url.dart';
 import 'package:provider/provider.dart';
-
 
 class ChatHistoryPage extends StatefulWidget {
   const ChatHistoryPage({super.key});
@@ -11,60 +11,40 @@ class ChatHistoryPage extends StatefulWidget {
 }
 
 class _ChatHistoryPageState extends State<ChatHistoryPage> {
-
-
-  
-
   @override
   Widget build(BuildContext context) {
+    final urlProvider = Provider.of<Url>(context);
+    final currentUrl = urlProvider.url;
 
-  final urlProvider = Provider.of<Url>(context);
-  final currentUrl = urlProvider.url;
-
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Chat History",
-          style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
+    // Wrap the Scaffold with a Container for the gradient background
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF83a4d4), Color(0xFFb6fbff)],
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF83a4d4), Color(0xFFb6fbff)],
+      child: Scaffold(
+        backgroundColor: Colors.transparent, // Make scaffold background transparent
+        appBar: AppBar(
+          backgroundColor: Colors.transparent, // Transparent background
+          elevation: 0, // No shadow
+          systemOverlayStyle: SystemUiOverlayStyle.light, // Light icons for the status bar
+          title: const Text(
+            "Chat History",
+            style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
           ),
         ),
-        child: Padding(
+        body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: <Widget>[
               Expanded(
                 child: ListView(
                   children: const <Widget>[
-                    ChatBubble(
-                      text: 'Hello, how was your day',
-                      isUser: false,
-                    ),
-                    ChatBubble(
-                      text: 'good, we are watching a lex fridman podcast today',
-                      isUser: true,
-                    ),
-                    ChatBubble(
-                      text: 'great!',
-                      isUser: false,
-                    ),
-                    ChatBubble(
-                      text: 'wow that was a good take by Marc Andreessen',
-                      isUser: false,
-                    ),
-                    ChatBubble(
-                      text: 'I know, right',
-                      isUser: true,
-                    ),
+                    // Your ChatBubble widgets
                   ],
                 ),
               ),

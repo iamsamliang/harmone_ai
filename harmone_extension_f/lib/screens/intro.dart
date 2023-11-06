@@ -13,6 +13,8 @@ class IntroPage extends StatefulWidget {
 }
 
 class _IntroPageState extends State<IntroPage> {
+
+  
   Future<void> _getCurrentTabUrl() async {
     try {
       List<chrome_api.Tab> tabs = await promiseToFuture(
