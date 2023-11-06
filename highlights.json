@@ -1,0 +1,320 @@
+[
+    {
+        "segment_id": 4,
+        "start_time": 19.0,
+        "end_time": 24.0,
+        "highlight": "this is a highlight. The commentator is referencing a player named Luca who has just scored 40 points in the game."
+    },
+    {
+        "segment_id": 1,
+        "start_time": 7.0,
+        "end_time": 12.0,
+        "highlight": "this segment is a highlight. It mentions the player's stats of eight points and ten rebounds, indicating a strong performance in the game."
+    },
+    {
+        "segment_id": 0,
+        "start_time": 0.0,
+        "end_time": 7.0,
+        "highlight": "this is a highlight. The segment mentions the top scorers of the game, Hardaway and Kyrie, as well as a player"
+    },
+    {
+        "segment_id": 5,
+        "start_time": 24.0,
+        "end_time": 28.0,
+        "highlight": "this segment is a highlight. It is referring to the last three minutes of the game and implies that there will be exciting moments to come"
+    },
+    {
+        "segment_id": 11,
+        "start_time": 48.0,
+        "end_time": 51.0,
+        "highlight": "this segment is a highlight. It describes a competitive back-and-forth between two players, Luca and Royce O'Neill."
+    },
+    {
+        "segment_id": 14,
+        "start_time": 55.0,
+        "end_time": 59.0,
+        "highlight": "this is a highlight. The commentator is describing a play where Hardaway is driving towards the basket."
+    },
+    {
+        "segment_id": 19,
+        "start_time": 78.0,
+        "end_time": 82.0,
+        "highlight": "this is a highlight. The commentator is highlighting the strong defensive performance of player Ben."
+    },
+    {
+        "segment_id": 23,
+        "start_time": 89.0,
+        "end_time": 92.0,
+        "highlight": "this is a highlight. The commentator mentions a player named Cimitino who is playing defense and then the ball is passed to a player"
+    },
+    {
+        "segment_id": 25,
+        "start_time": 94.0,
+        "end_time": 97.0,
+        "highlight": "this is a highlight. The commentator is describing a crucial moment in the game where the shot clock is running down and the ball is being"
+    },
+    {
+        "segment_id": 26,
+        "start_time": 97.0,
+        "end_time": 100.0,
+        "highlight": "this is a highlight. It is a moment where James is on the line, possibly for a free throw, and is being stared down"
+    },
+    {
+        "segment_id": 29,
+        "start_time": 107.0,
+        "end_time": 110.0,
+        "highlight": "this is a highlight. The commentator is emphasizing the importance of defense in the game and predicting that the team who can make defensive stops will"
+    },
+    {
+        "segment_id": 31,
+        "start_time": 113.0,
+        "end_time": 116.0,
+        "highlight": "this segment is a highlight. It is referring to the use of a smaller lineup in basketball, which allows for faster and more agile players"
+    },
+    {
+        "segment_id": 33,
+        "start_time": 119.0,
+        "end_time": 121.0,
+        "highlight": "this is a highlight. The commentator mentions that the ball goes to Ben Simmons."
+    },
+    {
+        "segment_id": 32,
+        "start_time": 116.0,
+        "end_time": 119.0,
+        "highlight": "this is a highlight. The commentator mentions a double team on a player named Dinwitty."
+    },
+    {
+        "segment_id": 35,
+        "start_time": 127.0,
+        "end_time": 135.0,
+        "highlight": "this is a highlight. The commentator is praising Josh Green for his effort and mentioning his pass to Roy Fogil."
+    },
+    {
+        "segment_id": 36,
+        "start_time": 135.0,
+        "end_time": 139.0,
+        "highlight": "this segment is a highlight. It describes a specific play in the game where a player had a successful closeout on defense."
+    },
+    {
+        "segment_id": 38,
+        "start_time": 142.0,
+        "end_time": 148.0,
+        "highlight": "this is a highlight. The commentator is praising Josh Green for his effort in the game."
+    },
+    {
+        "segment_id": 37,
+        "start_time": 139.0,
+        "end_time": 142.0,
+        "highlight": "this is a highlight. The commentator is discussing a play that affected O'Neal in some way."
+    },
+    {
+        "segment_id": 40,
+        "start_time": 152.0,
+        "end_time": 155.0,
+        "highlight": "this is a highlight. The player has made two consecutive three-point shots."
+    },
+    {
+        "segment_id": 39,
+        "start_time": 148.0,
+        "end_time": 152.0,
+        "highlight": "this is a highlight. The segment is summarizing that Luca has scored 43 points in the game."
+    },
+    {
+        "segment_id": 41,
+        "start_time": 155.0,
+        "end_time": 157.0,
+        "highlight": "this is a highlight. The commentator is acknowledging a player's impressive performance, specifically their high efficiency score of 43."
+    },
+    {
+        "segment_id": 44,
+        "start_time": 161.0,
+        "end_time": 163.0,
+        "highlight": "this is a highlight. The commentator is mentioning a player who is attempting to achieve his eighth point in the game."
+    },
+    {
+        "segment_id": 45,
+        "start_time": 163.0,
+        "end_time": 168.0,
+        "highlight": "this is a highlight. The commentator is excitedly announcing that someone has successfully made a shot and their team is now in the lead."
+    },
+    {
+        "segment_id": 47,
+        "start_time": 175.0,
+        "end_time": 183.0,
+        "highlight": "this is a highlight. The commentator is praising Luca's performance in the game."
+    },
+    {
+        "segment_id": 48,
+        "start_time": 183.0,
+        "end_time": 187.0,
+        "highlight": "this is a highlight. The commentator is mentioning that a player has made his eighth three-point shot, which is tying his career high."
+    },
+    {
+        "segment_id": 50,
+        "start_time": 191.0,
+        "end_time": 195.0,
+        "highlight": "this is a highlight. The commentator mentions that Dinwitty has been called for a foul with 106 seconds left in the game,"
+    },
+    {
+        "segment_id": 58,
+        "start_time": 216.0,
+        "end_time": 219.0,
+        "highlight": "this is a highlight. The commentator expresses their excitement to watch Luca play."
+    },
+    {
+        "segment_id": 68,
+        "start_time": 252.0,
+        "end_time": 257.0,
+        "highlight": "this is a highlight. The commentator is mentioning a critical point in the game where a two-point shot could potentially tie the score."
+    },
+    {
+        "segment_id": 69,
+        "start_time": 257.0,
+        "end_time": 260.0,
+        "highlight": "this segment is a highlight. It is describing a pivotal moment in the game where a three-point shot could potentially change the score and give"
+    },
+    {
+        "segment_id": 71,
+        "start_time": 262.0,
+        "end_time": 267.0,
+        "highlight": "this is a highlight. The commentator is referring to a player named Luca who has made a significant play to help his team, the Mavericks"
+    },
+    {
+        "segment_id": 73,
+        "start_time": 268.0,
+        "end_time": 273.0,
+        "highlight": "this is a highlight. The commentator is describing a play where Camp Thomas Tysett makes a step back and shoots a long shot."
+    },
+    {
+        "segment_id": 74,
+        "start_time": 274.0,
+        "end_time": 279.0,
+        "highlight": "this is a highlight. The segment is summarizing that Camp Thomas has scored 30 points in the game."
+    },
+    {
+        "segment_id": 77,
+        "start_time": 283.0,
+        "end_time": 284.0,
+        "highlight": "this segment is a highlight. It refers to a defensive strategy where two players are guarding Luca, likely because he is a skilled and dangerous"
+    },
+    {
+        "segment_id": 79,
+        "start_time": 286.0,
+        "end_time": 288.0,
+        "highlight": "this is a highlight. The commentator is describing a play where a player named Green received a pass and aggressively went after it."
+    },
+    {
+        "segment_id": 83,
+        "start_time": 292.0,
+        "end_time": 293.0,
+        "highlight": "this segment is a highlight. It is a play-by-play commentary of a successful shot made by a player named Cleba."
+    },
+    {
+        "segment_id": 93,
+        "start_time": 324.0,
+        "end_time": 329.0,
+        "highlight": "this is a highlight. The commentator is describing a player making a difficult shot from a distance, known as a three point hook shot."
+    },
+    {
+        "segment_id": 94,
+        "start_time": 329.0,
+        "end_time": 334.0,
+        "highlight": "this is a highlight. It describes a three point sky hook made by Luca during the basketball game."
+    },
+    {
+        "segment_id": 100,
+        "start_time": 348.0,
+        "end_time": 358.0,
+        "highlight": "this is a highlight. The commentator is mentioning that Luca Dongec has scored 49 points in the game."
+    },
+    {
+        "segment_id": 101,
+        "start_time": 358.0,
+        "end_time": 364.0,
+        "highlight": "this segment is a highlight. It highlights the impressive achievement of the player having 30 career games with 40 or more points."
+    },
+    {
+        "segment_id": 104,
+        "start_time": 369.0,
+        "end_time": 374.0,
+        "highlight": "this segment is a highlight. It is summarizing how impressive the current 40 point game is compared to previous ones."
+    },
+    {
+        "segment_id": 106,
+        "start_time": 377.0,
+        "end_time": 380.0,
+        "highlight": "this is a highlight. The commentator is praising a player's performance in the game."
+    },
+    {
+        "segment_id": 113,
+        "start_time": 390.0,
+        "end_time": 392.0,
+        "highlight": "this is a highlight. It is a statement about the offensive prowess of a player or team, implying that their opponent's defense is unable"
+    },
+    {
+        "segment_id": 117,
+        "start_time": 396.0,
+        "end_time": 400.0,
+        "highlight": "this is a highlight. The commentator is mentioning that the player scored 14 points in the last 5 minutes and 54 seconds after"
+    },
+    {
+        "segment_id": 118,
+        "start_time": 400.0,
+        "end_time": 406.0,
+        "highlight": "this segment is a highlight. It suggests that the game is intense and the outcome is uncertain. The commentator is discussing the strategy of the"
+    },
+    {
+        "segment_id": 119,
+        "start_time": 407.0,
+        "end_time": 409.0,
+        "highlight": "this is a highlight. The commentator is suggesting that the player should take a three-point shot."
+    },
+    {
+        "segment_id": 132,
+        "start_time": 444.0,
+        "end_time": 445.0,
+        "highlight": "this is a highlight. The commentator is likely referring to a player named Cam Topps, possibly setting up a play or making a shot"
+    },
+    {
+        "segment_id": 137,
+        "start_time": 451.0,
+        "end_time": 452.0,
+        "highlight": "this is a highlight. The commentator is likely referring to a player named Luca and emphasizing the importance of getting the ball to him."
+    },
+    {
+        "segment_id": 151,
+        "start_time": 487.0,
+        "end_time": 492.0,
+        "highlight": "this segment is a highlight. The commentator is referring to a player who has made an impressive shot in a difficult situation."
+    },
+    {
+        "segment_id": 152,
+        "start_time": 492.0,
+        "end_time": 498.0,
+        "highlight": "this is a highlight. The commentator is noting the significance of a free throw that was just made, as it has now made it a"
+    },
+    {
+        "segment_id": 160,
+        "start_time": 520.0,
+        "end_time": 523.0,
+        "highlight": "this is a highlight. The commentator mentions that the game is now a five point difference after a player named Green made two successful free throws"
+    },
+    {
+        "segment_id": 161,
+        "start_time": 523.0,
+        "end_time": 525.0,
+        "highlight": "this is a highlight. The commentator is describing a player named Denwoody making a three-point shot while leaning."
+    },
+    {
+        "segment_id": 167,
+        "start_time": 535.0,
+        "end_time": 539.0,
+        "highlight": "this is a highlight. The segment is summarizing the current score of the game, with the team called \"the vows\" leading"
+    },
+    {
+        "segment_id": 181,
+        "start_time": 568.0,
+        "end_time": 571.0,
+        "highlight": "this is a highlight. The segment is summarizing the final score of the game, with the team from Brooklyn (the Brooklyn Nets)"
+    }
+]
