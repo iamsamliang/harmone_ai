@@ -24,12 +24,6 @@ def get_captions(image_dir, device):
     return captions
 
 
-def store_captions(captions, vid_info, db_user, db_password):
-    # connect to database
-    engine = connect_db(db_user, db_password)
-    add_data(engine, vid_info, captions)
-
-
 # loader = ImageCaptionLoader(path_images=image_paths)
 # list_docs = loader.load()
 # print(list_docs)

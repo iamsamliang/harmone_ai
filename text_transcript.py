@@ -1,7 +1,7 @@
 import whisper
 import json
 import pinecone
-import cohere
+import openai
 from uuid import uuid4
 
 
@@ -17,7 +17,24 @@ def audio_to_text(audio_file, device_n):
     return result
 
 
-def store_transcription(json_path, cohere_key, pcone_key, model_name, vid_info):
+def format_json(json_path):
+    # load JSON object
+    with open(json_path, "r") as json_file:
+        json_object = json.load(json_file)
+
+    output = []
+    segments = json_object["segments"]
+    for segment in segments:
+        # (start_time, end_time, text)
+        output.append(
+            (int(segment["start"]) + 1, int(segment["end"]) + 1, segment["text"])
+        )
+    return output
+
+
+def store_transcription(json_path, openai_key, pcone_key, embedding_model, vid_info):
+    # openai key
+    openai.api_key = openai_key
     # load the Pinecone Index
     pinecone.init(api_key=pcone_key, environment="gcp-starter")
     index = pinecone.Index("ai-companion")
@@ -26,34 +43,38 @@ def store_transcription(json_path, cohere_key, pcone_key, model_name, vid_info):
     with open(json_path, "r") as json_file:
         json_object = json.load(json_file)
 
-    # setup the name of the model we want to use, the API key, and the input type.
-    input_type_embed = "search_document"
-
-    co = cohere.Client(cohere_key)
-
     texts = []
+    metadata = []
     segments = json_object["segments"]
     for segment in segments:
         # relevant segment keys = { "start", "end", "text" }
         # "start": 0.0, "end": 7.0, "text": " Hardaway 19, Kyrie 17, power 11, O'Neill with a three."
 
-        template = f'From second {segment["start"]} to second {segment["end"]}, the video said {segment["text"]}'
-        texts.append(template)
+        # text = f'From second {int(segment["start"]) + 1} to second {int(segment["end"]) + 1}, the video said "{segment["text"]}"'
+        text = f'{int(segment["start"]) + 1} to {int(segment["end"]) + 1}'
+        texts.append(text)
+        meta = (
+            f'{int(segment["start"]) + 1}-{int(segment["end"]) + 1}: {segment["text"]}'
+        )
+        metadata.append({"text": meta, "url": vid_info["url"]})
 
     # get the embeddings
-    embeds = co.embed(
-        texts=texts, model=model_name, input_type=input_type_embed
-    ).embeddings
+    res = openai.Embedding.create(input=texts, model=embedding_model)
+    embeds = [record["embedding"] for record in res["data"]]
 
     start_idx = 0
     batch_limit = 100
     embed_len = len(embeds)
-    # need metadata to do filtered search
-    metadata = [{"url": vid_info["url"]}] * batch_limit
+    # need metadata to do filtered search and retain the original text
+    # metadata = [{"url": vid_info["url"]}] * batch_limit
+    # metadata = [{"text": text, "url": vid_info["url"]} for text in texts]
+    assert len(metadata) == embed_len
 
     # add embeddings to index
     while start_idx < embed_len:
         ids = [str(uuid4()) for _ in range(batch_limit)]
         end_idx = min(start_idx + batch_limit, embed_len)
-        index.upsert(vectors=zip(ids, embeds[start_idx:end_idx], metadata))
+        index.upsert(
+            vectors=zip(ids, embeds[start_idx:end_idx], metadata[start_idx:end_idx])
+        )
         start_idx = end_idx
