@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, select, and_
+from sqlalchemy import create_engine, select, and_, func, or_
 from db_models import Base, Video, Caption, AudioText
 from sqlalchemy.orm import Session
 
@@ -15,36 +15,45 @@ def connect_db(user, password):
 def add_data(engine, video: dict, captions: list[str], audio_texts: list[tuple]):
     # Add video data
     with Session(engine) as session:
-        vid_obj = Video(
-            title=video["title"],
-            url=video["url"],
-            author=video["author"],
-            desc=video["desc"],
-            length=video["length"],
-        )
+        vid_obj = session.scalars(
+            select(Video).filter_by(url=video["url"]).limit(1)
+        ).first()
 
-        session.add(vid_obj)
-        session.commit()
-
-        # Add caption data
-        rows = []
-        for time, caption in enumerate(captions):  # assume caption in order
-            res = Caption(timestamp=(time + 1), caption=caption, video_id=vid_obj.id)
-            rows.append(res)
-
-        session.add_all(rows)
-        session.commit()
-
-        # Add audio transcription
-        rows = []
-        for start_t, end_t, txt in audio_texts:
-            res = AudioText(
-                start_time=start_t, end_time=end_t, text=txt, video_id=vid_obj.id
+        # don't add duplicates
+        if vid_obj is None:
+            print(f"\n\nAdding video and captions\n\n")
+            vid_obj = Video(
+                title=video["title"],
+                url=video["url"],
+                author=video["author"],
+                desc=video["desc"],
+                length=video["length"],
             )
-            rows.append(res)
+            session.add(vid_obj)
+            session.commit()
 
-        session.add_all(rows)
-        session.commit()
+            # Add caption data
+            rows = []
+            for time, caption in enumerate(captions):  # assume caption in order
+                res = Caption(
+                    timestamp=(time + 1), caption=caption, video_id=vid_obj.id
+                )
+                rows.append(res)
+
+            session.add_all(rows)
+            session.commit()
+
+            # Add audio transcription
+            print(f"\n\nAdding audio transcript\n\n")
+            rows = []
+            for start_t, end_t, txt in audio_texts:
+                res = AudioText(
+                    start_time=start_t, end_time=end_t, text=txt, video_id=vid_obj.id
+                )
+                rows.append(res)
+
+            session.add_all(rows)
+            session.commit()
 
 
 def db_get_captions(engine, video_url, start_sec, curr_sec):
@@ -57,7 +66,7 @@ def db_get_captions(engine, video_url, start_sec, curr_sec):
 
         # query the Caption table for captions within the specified timestamp range
         captions = session.scalars(
-            select(Caption)
+            select(Caption.caption)
             .filter(
                 and_(
                     Caption.video_id == video.id,
@@ -67,20 +76,100 @@ def db_get_captions(engine, video_url, start_sec, curr_sec):
             .order_by(Caption.timestamp)
         ).all()
 
-    return [caption.caption for caption in captions]
+    return captions
 
 
-def db_get_transcript(engine, video_url, start_sec, curr_sec):
-    pass
+def db_get_transcript(engine, video_url, start_sec, end_sec):
+    with Session(engine) as session:
+        video = session.scalars(select(Video).filter_by(url=video_url).limit(1)).first()
+
+        ################################################################################################################
+
+        overlap_duration = func.least(AudioText.end_time, end_sec) - func.greatest(
+            AudioText.start_time, start_sec
+        )
+
+        # subquery to find the duration of the largest overlap
+        largest_overlap_duration_subq = (
+            session.query(func.max(overlap_duration).label("max_overlap_duration"))
+            .filter(
+                or_(
+                    and_(
+                        AudioText.start_time < start_sec, AudioText.end_time > start_sec
+                    ),
+                    and_(AudioText.start_time < end_sec, AudioText.end_time > end_sec),
+                ),
+                and_(AudioText.video_id == video.id),
+            )
+            .subquery()
+        )
+
+        ################################################################################################################
+
+        # query for intervals with the largest overlap duration
+        intervals_with_largest_overlap = session.scalars(
+            select(AudioText)
+            .where(
+                or_(
+                    and_(
+                        AudioText.start_time < start_sec, AudioText.end_time > start_sec
+                    ),
+                    and_(AudioText.start_time < end_sec, AudioText.end_time > end_sec),
+                ),
+                and_(
+                    AudioText.video_id == video.id,
+                    overlap_duration
+                    == largest_overlap_duration_subq.c.max_overlap_duration,
+                ),
+            )
+            .order_by(AudioText.start_time.asc())
+        ).all()
+
+        ################################################################################################################
+
+        # query for completely overlapped intervals
+        completely_overlapped_intervals = session.scalars(
+            select(AudioText.text)
+            .where(
+                and_(
+                    AudioText.start_time >= start_sec,
+                    AudioText.end_time <= end_sec,
+                    AudioText.video_id == video.id,
+                )
+            )
+            .order_by(AudioText.start_time.asc())
+        ).all()
+
+        ################################################################################################################
+
+        # putting the transcriptions in order by time
+        overlap_len = len(intervals_with_largest_overlap)
+        if overlap_len == 1:
+            elem = intervals_with_largest_overlap[0]
+            if elem.start_time < start_sec:
+                completely_overlapped_intervals.insert(0, elem.text)
+            else:
+                completely_overlapped_intervals.append(elem.text)
+        elif overlap_len == 2:
+            completely_overlapped_intervals.insert(
+                0, intervals_with_largest_overlap[0].text
+            )
+            completely_overlapped_intervals.append(
+                intervals_with_largest_overlap[1].text
+            )
+
+    return completely_overlapped_intervals
 
 
-# import os
-# from dotenv import load_dotenv
+import os
+from dotenv import load_dotenv
 
-# load_dotenv()
-# db_user = os.getenv("DB_USER")
-# db_password = os.getenv("DB_PASSWORD")
-# yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"
+load_dotenv()
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"
 
-# engine = connect_db(db_user, db_password)
-# captions = db_get_captions(engine, yt_url, 295, 300)
+engine = connect_db(db_user, db_password)
+res = db_get_transcript(engine, yt_url, 311, 345)
+print("\n\n\n")
+print(" ".join(res))
