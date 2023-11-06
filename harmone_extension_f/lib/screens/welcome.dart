@@ -9,7 +9,6 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,31 +21,77 @@ class _WelcomePageState extends State<WelcomePage> {
           ),
         ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text(
-                'Welcome',
-                style: TextStyle(fontSize: 56, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),  // Adds spacing between the text and button
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const IntroPage(), 
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text(
+                  'Welcome',
+                  style: TextStyle(
+                    fontSize: 56,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        offset: Offset(2.0, 2.0),
+                        blurRadius: 3.0,
+                        color: Color.fromARGB(150, 0, 0, 0),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),  // Increased spacing for a cleaner look
+                Material(  // Wrap ElevatedButton with Material
+                  elevation: 5.0,  // Add shadow to button
+                  borderRadius: BorderRadius.circular(30.0),  // Rounded corners
+                  child: Container(
+                    width: double.infinity,  // Make the button wider
+                    height: 60,  // Increase button height for a larger tap target
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30.0),
                     ),
-                  );
-                },
-                child: const Icon(Icons.arrow_forward),
-              ),
-            ],
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const IntroPage(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.white,  // Background color
+                        onPrimary: const Color(0xFF83a4d4),  // Text color
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Get Started',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF83a4d4),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: Color(0xFF83a4d4),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
-
 }
