@@ -79,19 +79,19 @@ class _ChatHistoryPageState extends State<ChatHistoryPage> {
                 isUser: false,
               ),
               ChatBubble(
-                text: 'good, we are watching a lex fridman podcast today',
+                text: 'Good, we are watching a lex fridman podcast today',
                 isUser: true,
               ),
               ChatBubble(
-                text: 'great!',
+                text: 'Great!',
                 isUser: false,
               ),
               ChatBubble(
-                text: 'wow that was a good take by Marc Andreessen',
+                text: 'Wow that was a good take by Marc Andreessen!',
                 isUser: false,
               ),
               ChatBubble(
-                text: 'I know, right',
+                text: 'Absolutely!',
                 isUser: true,
               ), // ... Your existing ListView of ChatBubbles
             ],
