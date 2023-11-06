@@ -24,8 +24,8 @@ class _ChatHistoryPageState extends State<ChatHistoryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          currentUrl,
+        title: const Text(
+          "Chat History",
           style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
