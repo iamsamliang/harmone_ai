@@ -10,5 +10,12 @@
     "background": {
         "service_worker": "background.js"
     },
-    "permissions": ["tabs"]
+    "permissions": ["tabs", "activeTab", "scripting"],
+    "host_permissions": ["https://www.youtube.com/*"],
+    "content_scripts": [
+        {
+          "matches": ["https://www.youtube.com/*"],
+          "js": ["content.js"]
+        }
+      ]
 }

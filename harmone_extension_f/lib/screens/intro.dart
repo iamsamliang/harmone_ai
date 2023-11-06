@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:harmone_extension_f/screens/chat_history.dart';
 import 'package:harmone_extension_f/providers/url.dart';
 import 'package:provider/provider.dart';
-import 'dart:js_util';
+import 'dart:js_util' as js_util;
 import 'package:harmone_extension_f/providers/chrome_api.dart' as chrome_api;
+import 'dart:js' as js;
 
 class IntroPage extends StatefulWidget {
   const IntroPage({super.key});
@@ -13,9 +14,27 @@ class IntroPage extends StatefulWidget {
 }
 
 class _IntroPageState extends State<IntroPage> {
+void getCurrentYoutubeTimestamp() {
+  print("timestamp fetch active");
+
+  js.context['chrome']['runtime'].callMethod('sendMessage', [
+    js.JsObject.jsify({
+      'action': 'getYoutubeVideoCurrentTime',
+    }),
+    js.allowInterop((result) {
+      if (js.context['chrome']['runtime']['lastError'] != null) {
+        print('Error: ${js.context['chrome']['runtime']['lastError']}');
+      } else {
+        print('Current video time: $result');
+      }
+    })
+  ]);
+}
+
+
   Future<void> _getCurrentTabUrl() async {
     try {
-      List<chrome_api.Tab> tabs = await promiseToFuture(
+      List<chrome_api.Tab> tabs = await js_util.promiseToFuture(
         chrome_api.query(chrome_api.ParameterQueryTabs(
             active: true, lastFocusedWindow: true)),
       );
@@ -75,6 +94,7 @@ class _IntroPageState extends State<IntroPage> {
                     ),
                     child: ElevatedButton(
                       onPressed: () async {
+                        getCurrentYoutubeTimestamp();
                         await _getCurrentTabUrl(); // Fetch the current tab URL
                         Navigator.of(context).push(
                           MaterialPageRoute(
