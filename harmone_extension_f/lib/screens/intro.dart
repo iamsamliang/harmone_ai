@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:harmone_extension_f/screens/chat_history.dart';
-import 'package:js/js.dart';
 import 'package:harmone_extension_f/providers/url.dart';
+import 'package:js/js.dart';
 import 'package:provider/provider.dart';
+import 'dart:js' as js;
 
-@JS()
-external void getCurrentTabUrl(void Function(String) callback);
+
+@JS('chrome.runtime.sendMessage')
+external void sendMessage(Object message, void Function(String) responseCallback);
 
 void requestCurrentTabUrl(BuildContext context) {
-  getCurrentTabUrl(allowInterop((String url) {
-    print('Current tab URL: $url');
-    Provider.of<Url>(context, listen: false).updateURL(url);
-  }));
+  js.context.callMethod('sendMessageToBackground', [
+    {'message': 'get_url'},
+    (String url) {
+      print('Current tab URL: $url');
+      Provider.of<Url>(context, listen: false).updateURL(url);
+    },
+  ]);
 }
 
 class IntroPage extends StatefulWidget {
@@ -47,8 +52,8 @@ class _IntroPageState extends State<IntroPage> {
                   height: 20), // Adds spacing between the text and button
               ElevatedButton(
                 onPressed: () {
-                  requestCurrentTabUrl(
-                      context); // pass context to requestCurrentTabUrl
+                  // requestCurrentTabUrl(
+                  //     context); // pass context to requestCurrentTabUrl
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => const ChatHistoryPage(),

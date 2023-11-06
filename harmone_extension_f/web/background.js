@@ -1,17 +1,21 @@
-self.onmessage = function(event) {
-    const { message, sender, sendResponse } = event.data;
-    if (message === "get_url") {
-      chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        const tab = tabs[0];
-        sendResponse(tab.url);
-      });
-      return true;  // Keeps the message channel open for sendResponse.
-    }
-  };
-  
-  self.onconnect = function(connectEvent) {
-    connectEvent.ports[0].onmessage = self.onmessage;
-  };
-  
+console.log('background.js loaded revised');
 
-  
+function sendMessageToBackground(message, callback) {
+    chrome.runtime.sendMessage(message, callback);
+}
+
+function getCurrentTabUrl(callback) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      var tab = tabs[0];
+      callback(tab.url);
+    });
+}
+
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if(request.message === "get_url") {
+            getCurrentTabUrl(sendResponse);
+            return true;  // Keeps the message channel open for sendResponse.
+        }
+    }
+);

@@ -2,16 +2,13 @@
     "name": "Harmone AI",
     "description": "Harmone AI",
     "version": "1.0.0",
-    "content_security_policy": {
-      "extension_pages": "script-src 'self' ; object-src 'self'"
-    },
+    "manifest_version": 3,
     "action": {
-      "default_popup": "index.html",
-      "default_icon": "icons/Icon-192.png"
+        "default_popup": "index.html",
+        "default_icon": "icons/Icon-192.png"
     },
     "background": {
-      "service_worker": "background.js"
+        "service_worker": "background.js"
     },
-    "manifest_version": 3
-  }
-  
+    "permissions": ["tabs"]
+}
