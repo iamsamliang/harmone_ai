@@ -14,23 +14,25 @@ class IntroPage extends StatefulWidget {
 }
 
 class _IntroPageState extends State<IntroPage> {
-void getCurrentYoutubeTimestamp() {
-  print("timestamp fetch active");
 
-  js.context['chrome']['runtime'].callMethod('sendMessage', [
-    js.JsObject.jsify({
-      'action': 'getYoutubeVideoCurrentTime',
-    }),
-    js.allowInterop((result) {
-      if (js.context['chrome']['runtime']['lastError'] != null) {
-        print('Error: ${js.context['chrome']['runtime']['lastError']}');
-      } else {
-        print('Current video time: $result');
-      }
-    })
-  ]);
-}
-
+  void getCurrentYoutubeTimestamp() async {
+    print("calling getCurrentYoutubeTimestamp");
+    try {
+      var sendMessage =
+          js_util.getProperty(js.context['chrome']['runtime'], 'sendMessage');
+      var response =
+          await js_util.promiseToFuture(js_util.callMethod(sendMessage, [], [
+        {
+          'action': 'getYoutubeVideoCurrentTime',
+        },
+        js.allowInterop((result) {
+          print('Current video time: $result');
+        })
+      ]));
+    } catch (e) {
+      print('Error sending message: $e');
+    }
+  }
 
   Future<void> _getCurrentTabUrl() async {
     try {

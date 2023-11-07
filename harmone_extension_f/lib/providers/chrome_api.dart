@@ -6,6 +6,9 @@ import 'package:js/js.dart';
 @JS('tabs.query')
 external Future<List<Tab>> query(ParameterQueryTabs parameterQueryTabs);
 
+
+
+
 @JS()
 @anonymous
 class Tab {

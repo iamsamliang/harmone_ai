@@ -1,23 +1,23 @@
+// content-script.js
 console.log("content.js active");
 
-// Function to get the current time of the YouTube video player
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    console.log("Message received in content script");
+    if (request.action === "getYoutubeVideoCurrentTime") {
+      const videoTime = getYoutubeVideoCurrentTime();
+      sendResponse({ time: videoTime });
+    }
+    return true; // Keep the messaging channel open for sendResponse
+  }
+);
+
 function getYoutubeVideoCurrentTime() {
-  const videoPlayer = document.getElementsByClassName('video-stream')[0];
+  const videoPlayer = document.querySelector('video.html5-main-video');
   if (videoPlayer) {
     return videoPlayer.currentTime;
   } else {
-    console.error('No video player found');
+    console.error("No video player found");
     return null;
   }
 }
-
-// Function to log the current time of the video player
-function logCurrentTime() {
-  const currentTime = getYoutubeVideoCurrentTime();
-  if (currentTime !== null) {
-    console.log('Current video time: ' + currentTime);
-  }
-}
-
-// Set an interval to log the video time every second
-setInterval(logCurrentTime, 1000);
