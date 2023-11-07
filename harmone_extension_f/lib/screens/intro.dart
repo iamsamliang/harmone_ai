@@ -14,27 +14,23 @@ class IntroPage extends StatefulWidget {
 }
 
 class _IntroPageState extends State<IntroPage> {
-
   void getCurrentYoutubeTimestamp() async {
     print("calling getCurrentYoutubeTimestamp");
-    try {
-      var sendMessage =
-          js_util.getProperty(js.context['chrome']['runtime'], 'sendMessage');
-      var response =
-          await js_util.promiseToFuture(js_util.callMethod(sendMessage, [], [
-        {
-          'action': 'getYoutubeVideoCurrentTime',
-        },
-        js.allowInterop((result) {
-          print('Current video time: $result');
-        })
-      ]));
-    } catch (e) {
-      print('Error sending message: $e');
-    }
+
+    var sendMessage =
+        js_util.getProperty(js.context['chrome']['runtime'], 'sendMessage');
+    var response =
+        await js_util.promiseToFuture(js_util.callMethod(sendMessage, [], [
+      {
+        'action': 'getYoutubeVideoCurrentTime',
+      },
+      js.allowInterop((result) {
+        print('Current video time: $result');
+      })
+    ]));
   }
 
-  Future<void> _getCurrentTabUrl() async {
+  Future<String> _getCurrentTabUrl() async {
     try {
       List<chrome_api.Tab> tabs = await js_util.promiseToFuture(
         chrome_api.query(chrome_api.ParameterQueryTabs(
@@ -43,11 +39,12 @@ class _IntroPageState extends State<IntroPage> {
       if (tabs.isNotEmpty && tabs.first.url.isNotEmpty) {
         Provider.of<Url>(context, listen: false).updateURL(tabs.first.url);
         print('Current tab URL: ${tabs.first.url}');
+        return tabs.first.url;
       } else {
-        print('No tabs found');
+        throw Exception('No tabs found');
       }
     } catch (e) {
-      print('Failed to get current tab URL: $e');
+      throw Exception('Failed to get current tab URL: $e');
     }
   }
 
@@ -97,7 +94,7 @@ class _IntroPageState extends State<IntroPage> {
                     child: ElevatedButton(
                       onPressed: () async {
                         getCurrentYoutubeTimestamp();
-                        await _getCurrentTabUrl(); // Fetch the current tab URL
+                        String url = await _getCurrentTabUrl(); // Fetch the current tab URL
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const ChatHistoryPage(),
