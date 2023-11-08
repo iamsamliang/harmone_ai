@@ -3,13 +3,13 @@ import pytube
 
 
 # download video and audio, and extract video information
-def dl_video_audio(url, filename):
+def dl_video_audio(url, vid_file, audio_file):
     try:
         ### Download the video
         # download_command = f'yt-dlp -o "{filename}.%(ext)s" {url}'
 
         ### download the video and audio separately
-        download_command = f'yt-dlp -f bestaudio -o "{filename}_audio.%(ext)s" {url} && yt-dlp -f bestvideo -o "{filename}.%(ext)s" {url}'
+        download_command = f'yt-dlp -f bestaudio -o "{audio_file}.%(ext)s" {url} && yt-dlp -f bestvideo -o "{vid_file}.%(ext)s" {url}'
         subprocess.run(download_command, shell=True, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Failed to download video: {e}")

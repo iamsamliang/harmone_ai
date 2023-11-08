@@ -2,10 +2,18 @@ from langchain.document_loaders import ImageCaptionLoader
 from langchain.indexes import VectorstoreIndexCreator
 from transformers import pipeline
 from datasets import load_dataset
-from db_config import connect_db, add_data
 
 
-def get_captions(image_dir, device):
+def get_captions(image_dir: str, device: str):
+    """Convert the frames in image_dir to captions
+
+    Args:
+        image_dir (str): directory path
+        device (str): "cuda", "cpu", or "mps"
+
+    Returns:
+        list[str]: list of captions in sequential order
+    """
     # directory = "frames"
     # image_paths = [
     #     os.path.join(directory, file)
