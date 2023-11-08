@@ -14,6 +14,19 @@ class IntroPage extends StatefulWidget {
 }
 
 class _IntroPageState extends State<IntroPage> {
+  void sendMessageToContentScript() async {
+    var sendMessage =
+        js_util.getProperty(js.context['chrome']['runtime'], 'sendMessage');
+    var response =
+        await js_util.promiseToFuture(js_util.callMethod(sendMessage, [], [
+      'your-extension-id', // Replace with your actual extension ID
+      {'action': 'testMessage', 'payload': 'Hello from Dart!'},
+      js.allowInterop((result) {
+        print('Response from content script: $result');
+      })
+    ]));
+  }
+
   void getCurrentYoutubeTimestamp() async {
     print("calling getCurrentYoutubeTimestamp");
 
@@ -93,8 +106,9 @@ class _IntroPageState extends State<IntroPage> {
                     ),
                     child: ElevatedButton(
                       onPressed: () async {
-                        getCurrentYoutubeTimestamp();
-                        String url = await _getCurrentTabUrl(); // Fetch the current tab URL
+                        sendMessageToContentScript();
+                        String url =
+                            await _getCurrentTabUrl(); // Fetch the current tab URL
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const ChatHistoryPage(),

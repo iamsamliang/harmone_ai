@@ -1,23 +1,22 @@
 // content-script.js
 console.log("content.js active");
 
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    console.log("Message received in content script");
-    if (request.action === "getYoutubeVideoCurrentTime") {
-      const videoTime = getYoutubeVideoCurrentTime();
-      sendResponse({ time: videoTime });
-    }
-    return true; // Keep the messaging channel open for sendResponse
-  }
-);
-
-function getYoutubeVideoCurrentTime() {
+// Function to save the current time of the YouTube video to chrome.storage.session
+function saveCurrentTime() {
   const videoPlayer = document.querySelector('video.html5-main-video');
   if (videoPlayer) {
-    return videoPlayer.currentTime;
+    // Save the current time of the video in chrome.storage.session
+    chrome.storage.session.set({ 'youtubeVideoCurrentTime': videoPlayer.currentTime }, function() {
+      if (chrome.runtime.lastError) {
+        console.error("Error setting currentTime in storage:", chrome.runtime.lastError);
+      } else {
+        console.log("Current time saved:", videoPlayer.currentTime);
+      }
+    });
   } else {
     console.error("No video player found");
-    return null;
   }
 }
+
+// Run saveCurrentTime function periodically
+setInterval(saveCurrentTime, 1000); // Saves the time every 5 seconds
