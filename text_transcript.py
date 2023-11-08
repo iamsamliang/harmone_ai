@@ -27,7 +27,11 @@ def format_json(json_path):
     for segment in segments:
         # (start_time, end_time, text)
         output.append(
-            (int(segment["start"]) + 1, int(segment["end"]) + 1, segment["text"])
+            (
+                int(segment["start"]) + 1,
+                int(segment["end"]) + 1,
+                segment["text"].strip(),
+            )
         )
     return output
 
