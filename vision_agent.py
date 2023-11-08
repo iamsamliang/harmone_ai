@@ -1,7 +1,5 @@
 import base64
 import os
-import time
-from IPython.display import display, Image, Audio
 from dotenv import load_dotenv
 from db_config import connect_db, db_get_transcript
 import openai
@@ -17,7 +15,6 @@ def encode_image(image_path):
 load_dotenv()
 db_user = os.getenv("DB_USER")
 db_password = os.getenv("DB_PASSWORD")
-api_key = os.getenv("OPENAI_API_KEY")
 
 yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"
 
@@ -31,13 +28,9 @@ for filename in sorted(os.listdir(directory)):
         file_path = os.path.join(directory, filename)
         # Encode the image and add the base64 string to the list
         base64_images.append(encode_image(file_path))
-display_handle = display(None, display_id=True)
-# for img in base64_images:
-#     display_handle.update(Image(data=base64.b64decode(img.encode("utf-8"))))
-#     time.sleep(0.025)
 
 # curr_sec needs to be dynamically defined by identifying at which second the user started talking in the video
-context_len = 10  # defined in seconds
+context_len = 2  # defined in seconds
 curr_sec = max(2, 238)
 start_sec = max(1, curr_sec - context_len)
 frames_context = base64_images[start_sec : curr_sec + 1]
@@ -58,10 +51,8 @@ PROMPT_MESSAGES = [
 params = {
     "model": "gpt-4-vision-preview",
     "messages": PROMPT_MESSAGES,
-    "api_key": api_key,
-    "headers": {"Openai-Version": "2020-11-07"},
     "max_tokens": 200,
 }
 
-result = openai.ChatCompletion.create(**params)
+result = openai.chat.completions.create(**params)
 print(result.choices[0].message.content)
