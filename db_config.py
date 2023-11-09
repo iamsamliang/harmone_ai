@@ -4,7 +4,16 @@ from sqlalchemy.orm import Session
 
 
 # Create engine and session
-def connect_db(user, password):
+def connect_db(user: str, password: str):
+    """Connect to PostgreSQL database
+
+    Args:
+        user (str): Username
+        password (str): Password for the user
+
+    Returns:
+        Engine: The engine to connect to DB
+    """
     engine = create_engine(
         f"postgresql://{user}:{password}@localhost/companion", echo=True
     )
@@ -12,8 +21,32 @@ def connect_db(user, password):
     return engine
 
 
+def exists(engine, yt_url: str):
+    """Check if the video w/ this url already exists in the database
+
+    Args:
+        engine (Engine): Engine to connect to DB
+        yt_url (str): URL of YouTube video
+
+    Returns:
+        bool: If video exists in DB
+    """
+    with Session(engine) as session:
+        return (
+            session.scalars(select(Video).filter_by(url=yt_url).limit(1)).first()
+            is not None
+        )
+
+
 def add_data(engine, video: dict, captions: list[str], audio_texts: list[tuple]):
-    # Add video data
+    """Add video, captions, and audio-as-text to the DB if they don't already exist
+
+    Args:
+        engine (Engine): Engine to connect to DB
+        video (dict): video information
+        captions (list[str]): captions
+        audio_texts (list[tuple]): video transcription
+    """
     with Session(engine) as session:
         vid_obj = session.scalars(
             select(Video).filter_by(url=video["url"]).limit(1)
@@ -57,6 +90,17 @@ def add_data(engine, video: dict, captions: list[str], audio_texts: list[tuple])
 
 
 def db_get_captions(engine, video_url, start_sec, curr_sec):
+    """Return captions corresponding to video_url in the time interval [start_sec, curr_sec]
+
+    Args:
+        engine (Engine): Engine to connect to DB
+        video_url (str): YouTube video URL
+        start_sec (int): Start of time interval (seconds)
+        curr_sec (int): End of time interal (seconds)
+
+    Returns:
+        list[str]: list of captions in sequential order
+    """
     with Session(engine) as session:
         video = session.scalars(select(Video).filter_by(url=video_url).limit(1)).first()
 
@@ -80,6 +124,17 @@ def db_get_captions(engine, video_url, start_sec, curr_sec):
 
 
 def db_get_transcript(engine, video_url, start_sec, end_sec):
+    """Return audio-as-text corresponding to video_url in the time interval [start_sec, curr_sec]. Also include what was said from the largest non-completely overlapped time interval.
+
+    Args:
+        engine (Engine): Engine to connect to DB
+        video_url (str): YouTube video URL
+        start_sec (int): Start of time interval (seconds)
+        end_sec (int): End of time interval (seconds)
+
+    Returns:
+        list[str]: list of audio-as-text in sequential order
+    """
     with Session(engine) as session:
         video = session.scalars(select(Video).filter_by(url=video_url).limit(1)).first()
 
@@ -161,15 +216,15 @@ def db_get_transcript(engine, video_url, start_sec, end_sec):
     return completely_overlapped_intervals
 
 
-import os
-from dotenv import load_dotenv
+# import os
+# from dotenv import load_dotenv
 
-load_dotenv()
-db_user = os.getenv("DB_USER")
-db_password = os.getenv("DB_PASSWORD")
-yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"
+# load_dotenv()
+# db_user = os.getenv("DB_USER")
+# db_password = os.getenv("DB_PASSWORD")
+# yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"
 
-engine = connect_db(db_user, db_password)
-res = db_get_transcript(engine, yt_url, 311, 345)
-print("\n\n\n")
-print(" ".join(res))
+# engine = connect_db(db_user, db_password)
+# res = db_get_transcript(engine, yt_url, 311, 345)
+# print("\n\n\n")
+# print(" ".join(res))

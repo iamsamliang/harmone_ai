@@ -3,6 +3,9 @@ from fastapi.staticfiles import StaticFiles
 from connectionManager import ConnectionManager
 from history import HistoryManager
 import uuid
+from pipeline import pipeline
+from text_transcript import audio_to_text
+from agent import companion
 
 app = FastAPI()
 
@@ -11,6 +14,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 manager = ConnectionManager()
 history = HistoryManager()
 uuidDict = {}
+
 
 @app.get("/api/generator/client_id")
 async def extract_url():
@@ -37,6 +41,8 @@ async def extract_url(url: str, client_id: str):
     print(history_list)
 
     # todo 此处需要sam补充function调用
+    yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"  # remove later
+    pipeline(yt_url)
 
     # todo 上一步调用完成后，需要把解析好的文字数据存储到history
 
@@ -52,11 +58,26 @@ async def say_to_ai(file: UploadFile, client_id: str):
     res["msg"] = "服务异常"
     res["data"] = ""
 
+    # end_sec is the time in the video when the user started talking. Needs to be converted to seconds
+    # round to the nearest second, using round() function
+    end_sec = max(2, 238)  # remove later. This needs to be passed into this function
+    context_len = 10  # defined in seconds, whole number. This is a parameter to be passed into this func
+    reactor = "iShowSpeed"  # param
     # todo 解析voice to text
+
+    user_input = audio_to_text(file)
 
     # todo 上一步调用完成后，需要把解析好的文字数据存储到history
 
     # todo 此处需要sam补充function调用
+    yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"  # remove later
+    # agent needs yt_url unless there's a better way to structure/remember this
+    text_resp, audio_resp = companion(user_input, yt_url, end_sec, context_len, reactor)
+
+    # NOTE: audio_resp is the Audio object returned from openai.
+
+    say_to_user(client_id, audio_resp)
+    send_message(client_id, text_resp)
 
     # todo 上一步调用完成后，需要把反馈的文字数据存储到history
 
