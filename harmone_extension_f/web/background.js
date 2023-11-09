@@ -19,3 +19,19 @@ chrome.runtime.onMessage.addListener(
         }
     }
 );
+
+
+function saveToStorage(key, value) {
+    let items = {};
+    items[key] = value;
+    chrome.storage.session.set(items, function() {
+      if (chrome.runtime.lastError) {
+        console.error("Error setting item in storage:", chrome.runtime.lastError.message);
+      } else {
+        console.log(`Item saved in storage: ${key} = ${value}`);
+      }
+    });
+  }
+
+
+  saveToStorage("testKey", "testValue");
