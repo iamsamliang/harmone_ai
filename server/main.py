@@ -7,7 +7,6 @@ import uuid
 from pipeline import pipeline
 from text_transcript import audio_to_text
 from agent import companion
-from openai import OpenAI
 from openai.resources.audio.speech import HttpxBinaryResponseContent
 import os
 
@@ -37,7 +36,7 @@ async def extract_url():
 async def extract_url(yt_url: str, client_id: str):
     res = {}
     res["code"] = -1
-    res["msg"] = "服务异常"
+    res["msg"] = "error"
     res["data"] = ""
     history_list = history.get(client_id)
     # 这是当前用户的历史消息
@@ -59,6 +58,9 @@ async def extract_url(yt_url: str, client_id: str):
     chat.is_url = False
     history.append(client_id, chat)
 
+    res["code"] = 0
+    res["msg"] = "success"
+    res["data"] = ""
     return res
 
 
@@ -66,7 +68,7 @@ async def extract_url(yt_url: str, client_id: str):
 async def say_to_ai(file: UploadFile, client_id: str, yt_url: str, end_sec: int, context_len: int, reactor: str):
     res = {}
     res["code"] = -1
-    res["msg"] = "服务异常"
+    res["msg"] = "error"
     res["data"] = ""
 
     if end_sec < 2 or end_sec > 238:
@@ -138,7 +140,6 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             print(data)
     except WebSocketDisconnect:
         manager.disconnect(client_id)
-
 
 if __name__ == "__main__":
     import uvicorn
