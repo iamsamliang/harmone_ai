@@ -38,6 +38,7 @@ dependencies:
   js: ^0.6.7
   provider: ^6.0.5
   html: ^0.15.4
+  flutter_sound: ^9.2.13
 
 dev_dependencies:
   flutter_test:
