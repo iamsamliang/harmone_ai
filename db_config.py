@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, select, and_, func, or_
-from db_models import Base, Video, Caption, AudioText
+from backend.app.models.models import Base, Video, Caption, AudioText
 from sqlalchemy.orm import Session
 
 

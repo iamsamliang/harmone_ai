@@ -1,10 +1,10 @@
 import os
 import json
 from dotenv import load_dotenv
-from download import dl_video_audio, extract_vid_info
-from text_transcript import audio_to_text, format_audio
-from extract_frames import extract_frames
-from image_captioning import get_captions
+from backend.app.utils.download import dl_video_audio, extract_vid_info
+from backend.app.utils.text_transcript import audio_to_text, format_audio
+from backend.app.utils.extract_frames import extract_frames
+from backend.app.utils.image_captioning import get_captions
 from db_config import connect_db, add_data, exists
 
 

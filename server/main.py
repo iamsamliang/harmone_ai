@@ -4,11 +4,11 @@ from connectionManager import ConnectionManager
 from history import HistoryManager
 from chat import Chat
 import uuid
-from pipeline import pipeline
-from text_transcript import audio_to_text
-from agent import companion
 from openai.resources.audio.speech import HttpxBinaryResponseContent
 import os
+from backend.app.utils.pipeline import pipeline
+from backend.app.utils.text_transcript import audio_to_text
+from backend.app.agent.agent import companion
 
 app = FastAPI()
 
