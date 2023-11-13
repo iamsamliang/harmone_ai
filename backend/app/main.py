@@ -1,14 +1,18 @@
 import os
 import uuid
+from typing import Annotated
 
 from fastapi import FastAPI, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from openai.resources.audio.speech import HttpxBinaryResponseContent
+from sqlalchemy.orm import Session
 
 from connectionManager import ConnectionManager
 from history import HistoryManager
 from chat import Chat
-from backend.app import utils, agent
+from database import get_db
+from backend.app import utils, agent, crud
 from backend.app.utils.text_transcript import audio_to_text
 
 app = FastAPI()
@@ -35,7 +39,9 @@ async def extract_url():
 
 
 @app.post("/api/youtube/url")
-async def extract_url(yt_url: str, client_id: str):
+async def extract_url(
+    db: Annotated[Session, Depends(get_db)], yt_url: str, client_id: str
+):
     res = {}
     res["code"] = -1
     res["msg"] = "error"
@@ -44,9 +50,7 @@ async def extract_url(yt_url: str, client_id: str):
     # 这是当前用户的历史消息
     print(history_list)
 
-    # todo 此处需要sam补充function调用
-    # yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"  # remove later
-    parsed_text = pipeline(yt_url)
+    video = utils.pipeline(db=db, yt_url=yt_url)
 
     chat = Chat()
     chat.role = "user"
@@ -68,6 +72,7 @@ async def extract_url(yt_url: str, client_id: str):
 
 @app.post("/api/youtube/sayToAI")
 async def say_to_ai(
+    db: Annotated[Session, Depends(get_db)],
     file: UploadFile,
     client_id: str,
     yt_url: str,
@@ -100,12 +105,24 @@ async def say_to_ai(
     chat.is_url = False
     history.append(client_id, chat)
 
-    # yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"  # remove later
     # agent needs yt_url unless there's a better way to structure/remember this
-    text_resp, audio_resp = companion(user_input, yt_url, end_sec, context_len, reactor)
-    # NOTE: audio_resp is the Audio object returned from openai.
+    video = crud.video.get(db=db, yt_url=yt_url)
+    if not video:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Video w/ id {video.id} doesn't exist",
+        )
 
-    say_to_user(client_id, text_resp, audio_resp)
+    response = agent.vision_agent(
+        db=db,
+        video_id=video.id,
+        user_input=user_input,
+        end_sec=end_sec,
+        context_len=context_len,
+        reactor=reactor,
+    )
+
+    say_to_user(client_id, response.input, response)
 
     return res
 

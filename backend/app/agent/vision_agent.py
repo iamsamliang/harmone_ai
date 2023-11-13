@@ -5,12 +5,12 @@ import openai
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from backend.app import models, crud
+from backend.app import crud
 
 
 def vision_agent(
     db: Session,
-    video: models.Video,
+    video_id: int,
     user_input: str,
     end_sec: int,
     context_len: int,
@@ -27,11 +27,13 @@ def vision_agent(
     load_dotenv()
 
     start_sec = max(1, end_sec - context_len)
-    frames_context = crud.frame.get(video=video, start_sec=start_sec, end_sec=end_sec)
+    frames_context = crud.frame.get(
+        db=db, video_id=video_id, start_sec=start_sec, end_sec=end_sec
+    )
     if not frames_context:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Video w/ id {video.id} has no frames from {start_sec} to {end_sec}",
+            detail=f"Video w/ id {video_id} has no frames from {start_sec} to {end_sec}",
         )
 
     for idx in range(len(frames_context)):
@@ -40,11 +42,13 @@ def vision_agent(
             # Encode the image to base64 strings and replace
             frames_context[idx] = encode_image(file_path)
 
-    res = crud.audiotext.get(db=db, video=video, start_sec=start_sec, end_sec=end_sec)
+    res = crud.audiotext.get(
+        db=db, video_id=video_id, start_sec=start_sec, end_sec=end_sec
+    )
     if not res:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Video w/ id {video.id} has no audio transcript from {start_sec} to {end_sec}",
+            detail=f"Video w/ id {video_id} has no audio transcript from {start_sec} to {end_sec}",
         )
 
     audio_context = " ".join(res)

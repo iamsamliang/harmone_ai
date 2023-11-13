@@ -1,14 +1,16 @@
 from sqlalchemy import select, func, or_, and_
 from sqlalchemy.orm import Session
 
-from backend.app.models import AudioText, Video
+from backend.app.models import AudioText
 
 
 class CRUDAudioText:
     def __init__(self, model):
         self.model = model
 
-    def get(self, db: Session, video: Video, start_sec: int, end_sec: int) -> list[str]:
+    def get(
+        self, db: Session, video_id: int, start_sec: int, end_sec: int
+    ) -> list[str]:
         overlap_duration = func.least(AudioText.end_time, end_sec) - func.greatest(
             AudioText.start_time, start_sec
         )
@@ -23,7 +25,7 @@ class CRUDAudioText:
                     ),
                     and_(AudioText.start_time < end_sec, AudioText.end_time > end_sec),
                 ),
-                and_(AudioText.video_id == video.id),
+                and_(AudioText.video_id == video_id),
             )
             .subquery()
         )
@@ -41,7 +43,7 @@ class CRUDAudioText:
                     and_(AudioText.start_time < end_sec, AudioText.end_time > end_sec),
                 ),
                 and_(
-                    AudioText.video_id == video.id,
+                    AudioText.video_id == video_id,
                     overlap_duration
                     == largest_overlap_duration_subq.c.max_overlap_duration,
                 ),
@@ -58,7 +60,7 @@ class CRUDAudioText:
                 and_(
                     AudioText.start_time >= start_sec,
                     AudioText.end_time <= end_sec,
-                    AudioText.video_id == video.id,
+                    AudioText.video_id == video_id,
                 )
             )
             .order_by(AudioText.start_time.asc())

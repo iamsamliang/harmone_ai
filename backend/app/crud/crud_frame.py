@@ -3,20 +3,20 @@ import os
 from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
 
-from backend.app.models import Frame, Video
+from backend.app.models import Frame
 
 
 class CRUDFrames:
     def __init__(self, model):
         self.model = model
 
-    def get(db: Session, video: Video, start_sec: int, end_sec: int) -> list[str]:
+    def get(db: Session, video_id: int, start_sec: int, end_sec: int) -> list[str]:
         # get frames within the specified timestamp range
         frames = db.scalars(
             select(Frame.frame_path)
             .filter(
                 and_(
-                    Frame.video_id == video.id,
+                    Frame.video_id == video_id,
                     Frame.timestamp.between(start_sec, end_sec),
                 )
             )
