@@ -1,11 +1,23 @@
 import base64
-import os
 from dotenv import load_dotenv
-from db_config import connect_db, db_get_transcript
+
 import openai
+from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+
+from backend.app import models, crud
 
 
-def vision_companion(user_input, yt_url, end_sec, context_len, reactor):
+def vision_agent(
+    db: Session,
+    video: models.Video,
+    user_input: str,
+    end_sec: int,
+    context_len: int,
+    reactor: str,
+):
+    # end_sec needs to be dynamically defined by identifying at which second the user started talking in the video
+
     # encode frames
     def encode_image(image_path):
         with open(image_path, "rb") as image_file:
@@ -13,33 +25,35 @@ def vision_companion(user_input, yt_url, end_sec, context_len, reactor):
 
     # get keys
     load_dotenv()
-    db_user = os.getenv("DB_USER")
-    db_password = os.getenv("DB_PASSWORD")
 
-    # Path to your directory of images
-    directory = "frames"
-    # Initialize a list to hold base64 strings
-    base64_images = []
-    # Iterate over each file in the directory
-    for filename in sorted(os.listdir(directory)):
-        if filename.lower().endswith((".png", ".jpg", ".jpeg")):
-            file_path = os.path.join(directory, filename)
-            # Encode the image and add the base64 string to the list
-            base64_images.append(encode_image(file_path))
-
-    # end_sec needs to be dynamically defined by identifying at which second the user started talking in the video
     start_sec = max(1, end_sec - context_len)
-    frames_context = base64_images[start_sec : end_sec + 1]
+    frames_context = crud.frame.get(video=video, start_sec=start_sec, end_sec=end_sec)
+    if not frames_context:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Video w/ id {video.id} has no frames from {start_sec} to {end_sec}",
+        )
 
-    engine = connect_db(db_user, db_password)
-    res = db_get_transcript(engine, yt_url, start_sec, end_sec)
+    for idx in range(len(frames_context)):
+        file_path = frames_context[idx]
+        if file_path.lower().endswith((".png", ".jpg", ".jpeg")):
+            # Encode the image to base64 strings and replace
+            frames_context[idx] = encode_image(file_path)
+
+    res = crud.audiotext.get(db=db, video=video, start_sec=start_sec, end_sec=end_sec)
+    if not res:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Video w/ id {video.id} has no audio transcript from {start_sec} to {end_sec}",
+        )
+
     audio_context = " ".join(res)
 
     PROMPT_MESSAGES = [
         {
             "role": "user",
             "content": [
-                f"You are a YouTube reactor like {reactor}. Your job is to be hype. React to the video content as you watch with your friend and respond to your friend if they say something. Given are the frames of a video from second {start_sec} to {end_sec}. During this time, the video said: '{audio_context}'. Your friend said: '{user_input}'",
+                f"You are a YouTube reactor like {reactor}. Your job is to be hype. React to the video content as you watch with your friend and respond to your friend if they say something. Given are the frames of a video from second {start_sec} to {end_sec}. During this time, the video also said: '{audio_context}'. Your friend said: '{user_input}'",
                 *map(lambda x: {"image": x, "resize": 768}, frames_context),
             ],
         },
@@ -63,7 +77,6 @@ def vision_companion(user_input, yt_url, end_sec, context_len, reactor):
     return response
 
 
-yt_url = "https://www.youtube.com/watch?v=hn0cygb3GLo"
 user_input = "nothing"
 reactor = "IShowSpeed"
 context_len = 2  # defined in seconds

@@ -4,6 +4,7 @@ from transformers import pipeline
 from datasets import load_dataset
 
 
+# Legacy
 def get_captions(image_dir: str, device: str):
     """Convert the frames in image_dir to captions
 

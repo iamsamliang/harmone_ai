@@ -3,6 +3,7 @@ from backend.app.models.models import Base, Video, Caption, AudioText
 from sqlalchemy.orm import Session
 
 
+# Legacy
 # Create engine and session
 def connect_db(user: str, password: str):
     """Connect to PostgreSQL database
@@ -89,7 +90,7 @@ def add_data(engine, video: dict, captions: list[str], audio_texts: list[tuple])
             session.commit()
 
 
-def db_get_captions(engine, video_url, start_sec, curr_sec):
+def db_get_captions(engine, video_url, start_sec, end_sec):
     """Return captions corresponding to video_url in the time interval [start_sec, curr_sec]
 
     Args:
@@ -114,7 +115,7 @@ def db_get_captions(engine, video_url, start_sec, curr_sec):
             .filter(
                 and_(
                     Caption.video_id == video.id,
-                    Caption.timestamp.between(start_sec, curr_sec),
+                    Caption.timestamp.between(start_sec, end_sec),
                 )
             )
             .order_by(Caption.timestamp)
