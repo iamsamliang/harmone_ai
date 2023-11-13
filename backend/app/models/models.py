@@ -24,18 +24,6 @@ class Video(Base):
         return f"Video(id={self.id!r}, title={self.title!r}, url={self.url!r}, author={self.author!r}, desc={self.desc!r}, length={self.length!r})"
 
 
-class Caption(Base):
-    __tablename__ = "captions"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    timestamp: Mapped[int]
-    caption: Mapped[str] = mapped_column(Text)
-
-    video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
-
-    def __repr__(self) -> str:
-        return f"Caption(id={self.id!r}, timestamp={self.timestamp!r}, caption={self.caption!r}, video_id={self.video_id!r})"
-
-
 class AudioText(Base):
     """CREATE TABLE audio_texts (
     interval_id SERIAL PRIMARY KEY,
@@ -56,3 +44,28 @@ class AudioText(Base):
     text: Mapped[str] = mapped_column(Text)
 
     video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
+
+
+class Frames(Base):
+    __tablename__ = "frames"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    timestamp: Mapped[int]
+    frame: Mapped[str]
+
+    video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
+
+    def __repr__(self) -> str:
+        return f"Caption(id={self.id!r}, timestamp={self.timestamp!r}, caption={self.caption!r}, video_id={self.video_id!r})"
+
+
+# Legacy
+class Caption(Base):
+    __tablename__ = "captions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    timestamp: Mapped[int]
+    caption: Mapped[str] = mapped_column(Text)
+
+    video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
+
+    def __repr__(self) -> str:
+        return f"Caption(id={self.id!r}, timestamp={self.timestamp!r}, caption={self.caption!r}, video_id={self.video_id!r})"

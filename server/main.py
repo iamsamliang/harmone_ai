@@ -3,9 +3,9 @@ from fastapi.staticfiles import StaticFiles
 from connectionManager import ConnectionManager
 from history import HistoryManager
 import uuid
-from pipeline import pipeline
-from text_transcript import audio_to_text
-from agent import companion
+from backend.app.utils.pipeline import pipeline
+from backend.app.utils.text_transcript import audio_to_text
+from backend.app.agent.agent import companion
 
 app = FastAPI()
 
