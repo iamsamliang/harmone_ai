@@ -8,12 +8,15 @@ from fastapi.staticfiles import StaticFiles
 from openai.resources.audio.speech import HttpxBinaryResponseContent
 from sqlalchemy.orm import Session
 
-from .connectionManager import ConnectionManager
-from .history import HistoryManager
-from .chat import Chat
-from .database import get_db
-from app import utils, agent, crud
-from app.utils.text_transcript import audio_to_text
+from connectionManager import ConnectionManager
+from user import UserManager
+from history import HistoryManager
+from chat import Chat
+from database import get_db
+import utils
+import agent
+import crud
+from utils.text_transcript import audio_to_text
 
 app = FastAPI()
 
@@ -21,15 +24,16 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 manager = ConnectionManager()
 history = HistoryManager()
-uuidDict = {}
+user = UserManager()
+
 
 @app.get("/api/generator/client_id")
 async def extract_url():
     u = uuid.uuid4()
-    print(uuidDict.get(u))
-    while uuidDict.get(u) is not None:
+    print(user.get(u))
+    while user.get(u) is not None:
         u = uuid.uuid4()
-    uuidDict[u] = True
+    user.append(u, "active", True)
     res = {}
     res["code"] = 0
     res["msg"] = "success"
@@ -39,7 +43,7 @@ async def extract_url():
 
 @app.post("/api/youtube/url")
 async def extract_url(
-    db: Annotated[Session, Depends(get_db)], yt_url: str, client_id: str
+        db: Annotated[Session, Depends(get_db)], yt_url: str, client_id: str
 ):
     res = {}
     res["code"] = -1
@@ -72,13 +76,13 @@ async def extract_url(
 
 @app.post("/api/youtube/sayToAI")
 async def say_to_ai(
-    db: Annotated[Session, Depends(get_db)],
-    file: UploadFile,
-    client_id: str,
-    yt_url: str,
-    end_sec: int,
-    context_len: int = 10,
-    reactor: str = "iShowSpeed",
+        db: Annotated[Session, Depends(get_db)],
+        file: UploadFile,
+        client_id: str,
+        yt_url: str,
+        end_sec: int,
+        context_len: int = 10,
+        reactor: str = "iShowSpeed",
 ):
     res = {}
     res["code"] = -1
@@ -141,7 +145,7 @@ async def say_to_user(client_id: str, text: str, audio: HttpxBinaryResponseConte
     audio.stream_to_file(audio_full_path)
     audio.close()
     # todo "http://127.0.0.1:8087/" later replace
-    await send_message(client_id, "http://127.0.0.1:8087/static/" + audio_file)
+    await send_message(client_id, audio_file)
 
 
 # push message to extensions
@@ -160,12 +164,10 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
     try:
         while True:
             data = await websocket.receive_text()
-            print(data)
     except WebSocketDisconnect:
         manager.disconnect(client_id)
 
+if __name__ == "__main__":
+    import uvicorn
 
-# if __name__ == "__main__":
-#     import uvicorn
-
-#     uvicorn.run(app, host="127.0.0.1", port=8087)
+    uvicorn.run(app, host="127.0.0.1", port=8087)
