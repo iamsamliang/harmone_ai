@@ -10,7 +10,6 @@ from sqlalchemy.orm import Session
 
 from connectionManager import ConnectionManager
 from user import UserManager
-from history import HistoryManager
 from chat import Chat
 from database import get_db
 import utils
@@ -23,7 +22,6 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 manager = ConnectionManager()
-history = HistoryManager()
 user = UserManager()
 
 
@@ -41,6 +39,21 @@ async def extract_url():
     return res
 
 
+@app.get("/api/base/email")
+async def email(client_id: str, email: str):
+    ret = user.append(client_id, "email", email)
+    res = {}
+    if ret:
+        res["code"] = 0
+        res["msg"] = "success"
+        res["data"] = ret
+    else:
+        res["code"] = -1
+        res["msg"] = "error"
+        res["data"] = ret
+    return res
+
+
 @app.post("/api/youtube/url")
 async def extract_url(
         db: Annotated[Session, Depends(get_db)], yt_url: str, client_id: str
@@ -49,7 +62,7 @@ async def extract_url(
     res["code"] = -1
     res["msg"] = "error"
     res["data"] = ""
-    history_list = history.get(client_id)
+    history_list = user.get_history(client_id)
     # 这是当前用户的历史消息
     print(history_list)
 
@@ -59,14 +72,14 @@ async def extract_url(
     chat.role = "user"
     chat.content = yt_url
     chat.is_url = True
-    history.append(client_id, chat)
+    user.append_history(client_id, chat)
 
     chat = Chat()
     chat.role = "user"
     # chat.content = parsed_text
     chat.content = "test"
     chat.is_url = False
-    history.append(client_id, chat)
+    user.append_history(client_id, chat)
 
     res["code"] = 0
     res["msg"] = "success"
@@ -99,7 +112,7 @@ async def say_to_ai(
     chat.role = "user"
     chat.content = yt_url
     chat.is_url = True
-    history.append(client_id, chat)
+    user.append_history(client_id, chat)
 
     user_input = audio_to_text(file)
 
@@ -107,7 +120,7 @@ async def say_to_ai(
     chat.role = "user"
     chat.content = user_input
     chat.is_url = False
-    history.append(client_id, chat)
+    user.append_history(client_id, chat)
 
     # agent needs yt_url unless there's a better way to structure/remember this
     video = crud.video.get(db=db, yt_url=yt_url)
@@ -138,7 +151,7 @@ async def say_to_user(client_id: str, text: str, audio: HttpxBinaryResponseConte
     chat.role = "assistant"
     chat.content = text
     chat.is_url = False
-    history.set(client_id, chat)
+    user.append_history(client_id, chat)
 
     audio_file = str(uuid.uuid4()) + ".mp3"
     audio_full_path = os.path.join(os.getcwd(), os.path.join("static", audio_file))
@@ -157,7 +170,6 @@ async def send_message(client_id: str, data: str):
         return False
     return True
 
-
 @app.websocket("/api/ws")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):
     await manager.connect(client_id, websocket)
@@ -166,6 +178,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             data = await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(client_id)
+
 
 if __name__ == "__main__":
     import uvicorn
