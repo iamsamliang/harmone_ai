@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:harmone_extension_f/providers/audio_record.dart';
 import 'package:harmone_extension_f/screens/chat_history.dart';
 import 'package:harmone_extension_f/providers/url.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => Url()),
+        ChangeNotifierProvider(create: (context) => AudioRecord(),)
       ],
       child: MyApp(),
     ),);

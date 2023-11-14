@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:harmone_extension_f/screens/chat_history.dart';
 import 'package:harmone_extension_f/providers/url.dart';
+import 'package:harmone_extension_f/providers/audio_record.dart';
 import 'package:provider/provider.dart';
 import 'dart:js_util' as js_util;
 import 'package:harmone_extension_f/providers/chrome_api.dart' as chrome_api;
@@ -14,6 +18,8 @@ class IntroPage extends StatefulWidget {
 }
 
 class _IntroPageState extends State<IntroPage> {
+
+  
   void sendMessageToContentScript() async {
     var sendMessage =
         js_util.getProperty(js.context['chrome']['runtime'], 'sendMessage');
@@ -60,6 +66,8 @@ class _IntroPageState extends State<IntroPage> {
       throw Exception('Failed to get current tab URL: $e');
     }
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -122,21 +130,24 @@ class _IntroPageState extends State<IntroPage> {
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Start Session',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                        children: [  
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              Provider.of<AudioRecord>(context, listen: false).startListening();
+                            },
+                            label: const Text(
+                              'Start Session',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF83a4d4),
+                              ),
+                            ), icon: const Icon(
+                              Icons.play_circle_fill,
                               color: Color(0xFF83a4d4),
                             ),
-                          ),
-                          SizedBox(width: 10),
-                          Icon(
-                            Icons.play_circle_fill,
-                            color: Color(0xFF83a4d4),
                           ),
                         ],
                       ),
