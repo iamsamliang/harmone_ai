@@ -60,7 +60,8 @@ async def extract_url(
 
     chat = Chat()
     chat.role = "user"
-    chat.content = parsed_text
+    # chat.content = parsed_text
+    chat.content = "test"
     chat.is_url = False
     history.append(client_id, chat)
 

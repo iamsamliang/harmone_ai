@@ -17,7 +17,7 @@ class Video(Base):
     desc: Mapped[Optional[str]] = mapped_column(Text)
     length: Mapped[int]
 
-    captions: Mapped[List["Caption"]] = relationship(cascade="all, delete")
+    captions: Mapped[List["Frame"]] = relationship(cascade="all, delete")
     audio_texts: Mapped[List["AudioText"]] = relationship(cascade="all, delete")
 
     def __repr__(self) -> str:
@@ -49,13 +49,13 @@ class Frame(Base):
 
 
 # Legacy
-class Caption(Base):
-    __tablename__ = "captions"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    timestamp: Mapped[int]
-    caption: Mapped[str] = mapped_column(Text)
+# class Caption(Base):
+#     __tablename__ = "captions"
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     timestamp: Mapped[int]
+#     caption: Mapped[str] = mapped_column(Text)
 
-    video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
+#     video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
 
-    def __repr__(self) -> str:
-        return f"Caption(id={self.id!r}, timestamp={self.timestamp!r}, caption={self.caption!r}, video_id={self.video_id!r})"
+#     def __repr__(self) -> str:
+#         return f"Caption(id={self.id!r}, timestamp={self.timestamp!r}, caption={self.caption!r}, video_id={self.video_id!r})"
