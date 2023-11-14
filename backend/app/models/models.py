@@ -17,42 +17,45 @@ class Video(Base):
     desc: Mapped[Optional[str]] = mapped_column(Text)
     length: Mapped[int]
 
-    captions: Mapped[List["Caption"]] = relationship(cascade="all, delete")
+    captions: Mapped[List["Frame"]] = relationship(cascade="all, delete")
     audio_texts: Mapped[List["AudioText"]] = relationship(cascade="all, delete")
 
     def __repr__(self) -> str:
         return f"Video(id={self.id!r}, title={self.title!r}, url={self.url!r}, author={self.author!r}, desc={self.desc!r}, length={self.length!r})"
 
 
-class Caption(Base):
-    __tablename__ = "captions"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    timestamp: Mapped[int]
-    caption: Mapped[str] = mapped_column(Text)
-
-    video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
-
-    def __repr__(self) -> str:
-        return f"Caption(id={self.id!r}, timestamp={self.timestamp!r}, caption={self.caption!r}, video_id={self.video_id!r})"
-
-
 class AudioText(Base):
-    """CREATE TABLE audio_texts (
-    interval_id SERIAL PRIMARY KEY,
-    start_time INT NOT NULL,
-    end_time INT NOT NULL,
-    text TEXT NOT NULL,
-    CONSTRAINT start_end_time_chk CHECK (start_time < end_time)
-    );
-    """
-
     __tablename__ = "audio_texts"
     __table_args__ = (
         CheckConstraint("start_time < end_time", name="start_end_time_chk"),
     )
+
     id: Mapped[int] = mapped_column(primary_key=True)
     start_time: Mapped[int]
     end_time: Mapped[int]
     text: Mapped[str] = mapped_column(Text)
 
     video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
+
+
+class Frame(Base):
+    __tablename__ = "frames"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    timestamp: Mapped[int]
+    frame_path: Mapped[str] = mapped_column(Text)
+
+    video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
+
+
+# Legacy
+# class Caption(Base):
+#     __tablename__ = "captions"
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     timestamp: Mapped[int]
+#     caption: Mapped[str] = mapped_column(Text)
+
+#     video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
+
+#     def __repr__(self) -> str:
+#         return f"Caption(id={self.id!r}, timestamp={self.timestamp!r}, caption={self.caption!r}, video_id={self.video_id!r})"

@@ -1,4 +1,3 @@
-import json
 from openai import OpenAI
 
 
@@ -31,7 +30,7 @@ def audio_to_text(audio_file: str):
     return transcript
 
 
-def format_audio(json_path: str):
+def format_audio(json_obj) -> list[tuple]:
     """Formats the audio-as-text from JSON to a list for adding to PostgreSQL database
 
     Args:
@@ -41,11 +40,8 @@ def format_audio(json_path: str):
         list[tuple]: a list containing tuple elements of the form: (start_time, end_time, text)
     """
 
-    with open(json_path, "r") as json_file:
-        json_object = json.load(json_file)
-
     output = []
-    segments = json_object["segments"]
+    segments = json_obj["segments"]
     for segment in segments:
         output.append(
             (

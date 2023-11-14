@@ -1,13 +1,18 @@
 import os
 from operator import itemgetter
 from dotenv import load_dotenv
+
+import openai
 from langchain.memory import ConversationBufferMemory
 from langchain.schema.runnable import RunnablePassthrough, RunnableLambda
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chat_models import ChatOpenAI
 from langchain.schema.output_parser import StrOutputParser
-from db_config import db_get_captions, connect_db, db_get_transcript
-import openai
+
+from app.crud.db_config import db_get_captions, connect_db, db_get_transcript
+
+
+# LEGACY
 
 
 # Build a prompt template from the stored data, have conversational memory for LLM to react and respond to user and video
