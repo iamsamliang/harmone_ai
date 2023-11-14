@@ -5,7 +5,7 @@ import openai
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from backend.app import crud
+from app import crud
 
 
 def vision_agent(

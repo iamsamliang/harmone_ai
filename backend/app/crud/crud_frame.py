@@ -3,7 +3,7 @@ import os
 from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
 
-from backend.app.models import Frame
+from app.models import Frame
 
 
 class CRUDFrames:

@@ -9,7 +9,7 @@ from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chat_models import ChatOpenAI
 from langchain.schema.output_parser import StrOutputParser
 
-from backend.app.crud.db_config import db_get_captions, connect_db, db_get_transcript
+from app.crud.db_config import db_get_captions, connect_db, db_get_transcript
 
 
 # LEGACY

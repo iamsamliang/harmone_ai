@@ -1,7 +1,7 @@
-from langchain.document_loaders import ImageCaptionLoader
-from langchain.indexes import VectorstoreIndexCreator
 from transformers import pipeline
 from datasets import load_dataset
+from langchain.document_loaders import ImageCaptionLoader
+from langchain.indexes import VectorstoreIndexCreator
 
 
 # Legacy

@@ -1,10 +1,11 @@
-from chat import Chat
 import uuid
+
+from .chat import Chat
 
 
 class HistoryManager:
     def __init__(self):
-        self.history: dict[str: list[Chat]] = {}
+        self.history: dict[str : list[Chat]] = {}
 
     async def set(self, id: str, chats: list[Chat]):
         for chat in chats:
@@ -24,7 +25,10 @@ class HistoryManager:
         if self.history.get(id) is None:
             self.history[id] = []
         for i in range(len(self.history[id])):
-            if self.history[id][i] == chat or self.history[id][i].chat_id == chat.chat_id:
+            if (
+                self.history[id][i] == chat
+                or self.history[id][i].chat_id == chat.chat_id
+            ):
                 self.history[id].pop(i)
                 break
 

@@ -30,7 +30,7 @@ def audio_to_text(audio_file: str):
     return transcript
 
 
-def format_audio(json_obj) -> list(tuple):
+def format_audio(json_obj) -> list[tuple]:
     """Formats the audio-as-text from JSON to a list for adding to PostgreSQL database
 
     Args:

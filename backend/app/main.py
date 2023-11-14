@@ -8,12 +8,12 @@ from fastapi.staticfiles import StaticFiles
 from openai.resources.audio.speech import HttpxBinaryResponseContent
 from sqlalchemy.orm import Session
 
-from connectionManager import ConnectionManager
-from history import HistoryManager
-from chat import Chat
-from database import get_db
-from backend.app import utils, agent, crud
-from backend.app.utils.text_transcript import audio_to_text
+from .connectionManager import ConnectionManager
+from .history import HistoryManager
+from .chat import Chat
+from .database import get_db
+from app import utils, agent, crud
+from app.utils.text_transcript import audio_to_text
 
 app = FastAPI()
 
@@ -166,7 +166,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
         manager.disconnect(client_id)
 
 
-if __name__ == "__main__":
-    import uvicorn
+# if __name__ == "__main__":
+#     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=8087)
+#     uvicorn.run(app, host="127.0.0.1", port=8087)
