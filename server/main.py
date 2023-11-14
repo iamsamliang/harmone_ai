@@ -18,7 +18,6 @@ manager = ConnectionManager()
 history = HistoryManager()
 uuidDict = {}
 
-
 @app.get("/api/generator/client_id")
 async def extract_url():
     u = uuid.uuid4()
