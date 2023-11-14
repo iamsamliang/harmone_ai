@@ -7,11 +7,11 @@ from sqlalchemy.orm import sessionmaker
 from backend.app.models.models import Base
 
 load_dotenv()
-user = os.getenv("DB_USER")
-password = os.getenv("DB_PASSWORD")
+db_url = os.getenv("DATABASE_URL")
 
-engine = create_engine(f"postgresql://{user}:{password}@localhost/companion", echo=True)
-Base.metadata.create_all(engine)  # create tables if don't exist
+# engine = create_engine(f"postgresql://{user}:{password}@localhost/companion", echo=True)
+engine = create_engine(db_url, echo=True)
+Base.metadata.create_all(engine)  # create tables if they don't exist
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
