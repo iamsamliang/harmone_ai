@@ -17,7 +17,7 @@ from app.utils.text_transcript import audio_to_text
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# app.mount("/static", StaticFiles(directory="static"), name="static")
 
 manager = ConnectionManager()
 history = HistoryManager()
