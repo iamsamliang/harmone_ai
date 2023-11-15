@@ -25,19 +25,45 @@ class AudioRecord with ChangeNotifier {
   void startListening() async {
     await initRecorder();
     
-    //  PermissionStatus status = await Permission.microphone.request();
-    // // bool hasPermission = await _recordingSession.hasPermission();
-    monitorAudioLevel();
+    window.navigator.getUserMedia(audio: true).then((stream) async {
+      await _recordingSession.startRecorder(
+      toFile: pathToAudio,
+      // codec: Codec.pcm16WAV,
+    );
+      _recorderSubscription = _recordingSession.onProgress!.listen((e) {
+        double? decibels = e.decibels;
+        decibels = 60;
+        print("decibels");
+        print(decibels);
+        if (decibels! > minVolume) {
+          if (!isRecording) {
+            isRecording = true;
+            startRecording();
+          }
+          _silenceTimer?.cancel();
+        } else {
+          _silenceTimer = Timer(Duration(seconds: 1), () {
+            if (isRecording) {
+              stopRecording();
+            }
+          });
+        }  
+      }, onError: (error) {
+        print('Error in stream: $error');
+      },
+      );
+    });
   }
 
   Future<void> startRecording() async {
     print("start recording");
-
-    await _recordingSession.startRecorder(
-      toFile: pathToAudio,
-      // codec: Codec.pcm16WAV,
-    );
-  
+    if(!isRecording) {
+      await _recordingSession.startRecorder(
+        toFile: pathToAudio,
+        // codec: Codec.pcm16WAV,
+      );
+    }
+   
     _recordingTimer?.cancel();
     _recordingTimer = Timer.periodic(Duration(seconds: 60), (timer) {
       if (isRecording) {
@@ -57,27 +83,7 @@ class AudioRecord with ChangeNotifier {
   }
 
   void monitorAudioLevel() {
-    print("monitorAudioLevel");
-    window.navigator.getUserMedia(audio: true).then((stream) => {
-      _recorderSubscription =
-        _recordingSession.onProgress!.listen((e) {
-        double? decibels = e.decibels;
-        decibels = 60;
-        print("decibels");
-        print(decibels);
-        if (decibels! > minVolume) {
-          if (!isRecording) {
-            startRecording();
-          }
-          _silenceTimer?.cancel();
-        } else {
-          _silenceTimer = Timer(Duration(seconds: 1), () {
-            if (isRecording) {
-              stopRecording();
-            }
-          });
-        }  
-      })
-    });
+    
+    // _recorderSubscription.cancel();
   }
 }
