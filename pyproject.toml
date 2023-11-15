@@ -2,12 +2,13 @@
 name = "harmone-ai"
 version = "0.1.0"
 description = ""
+license = "Proprietary"
 authors = ["Sam Liang <iamsamliang8@gmail.com>"]
 readme = "README.md"
 packages = [{include = "backend"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "~3.11.6"
 datasets = "2.14.6"
 fastapi = "0.104.1"
 langchain = "0.0.335"
