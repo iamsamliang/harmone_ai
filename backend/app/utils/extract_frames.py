@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 
@@ -6,6 +7,10 @@ def extract_frames(video_path, output_dir):
 
     # Convert to jpg for speed at the cost of a little accuracy
     # command = f"ffmpeg -i {input_video} -r 1 -frames:v 10 frames/image_%04d.jpg"
+
+    os.makedirs(
+        output_dir
+    )  # Creates the directory, should throw error if it don't work
 
     # this command is more accurate
     command = f"ffmpeg -i {video_path} -vf fps=1 {output_dir}/image_%04d.jpg"

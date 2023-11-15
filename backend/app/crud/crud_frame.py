@@ -6,11 +6,13 @@ from sqlalchemy.orm import Session
 from app.models import Frame
 
 
-class CRUDFrames:
+class CRUDFrame:
     def __init__(self, model):
         self.model = model
 
-    def get(db: Session, video_id: int, start_sec: int, end_sec: int) -> list[str]:
+    def get(
+        self, db: Session, video_id: int, start_sec: int, end_sec: int
+    ) -> list[str]:
         # get frames within the specified timestamp range
         frames = db.scalars(
             select(Frame.frame_path)
@@ -25,7 +27,7 @@ class CRUDFrames:
 
         return frames
 
-    def create(db: Session, vid_id: int, output_dir: str) -> list[Frame]:
+    def create(self, db: Session, vid_id: int, output_dir: str) -> list[Frame]:
         rows = []
         for time, frame_file in enumerate(os.listdir(output_dir)):
             frame_path = os.path.join(output_dir, frame_file)
@@ -38,4 +40,5 @@ class CRUDFrames:
         return rows
 
 
-frame = CRUDFrames(Frame)
+frame = CRUDFrame(Frame)
+frame.get

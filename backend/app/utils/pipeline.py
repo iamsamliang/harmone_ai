@@ -17,6 +17,7 @@ def pipeline(db: Session, yt_url: str):
     """
 
     # download youtube video and audio separately
+
     video = crud.video.get(db=db, yt_url=yt_url)
     if not video:
         vid_file = "yt_vid"  # do not add extensions (.mp4, etc) here
@@ -32,7 +33,7 @@ def pipeline(db: Session, yt_url: str):
 
         # convert audio to text
         audio_path = audio_file + ".webm"
-        transcription = audio_to_text(audio_path)  # alrdy json
+        transcription = audio_to_text(audio_path).dict()
         # Save as JSON
         # json_path = "vid_transcript.json"
         # with open(json_path, "w") as f:
@@ -53,11 +54,14 @@ def pipeline(db: Session, yt_url: str):
 
         # convert yt video to frames per second. Store in directory "frames"
         video_path = vid_file + ".webm"
-        output_dir = "frames"
-        extract_frames(video_path, output_dir)
+        output_dir = f"frames/{vid_info['url']}"
         try:
+            extract_frames(video_path, output_dir)
             crud.frame.create(db=db, vid_id=created_vid_obj.id, output_dir=output_dir)
         except IntegrityError as e:
+            db.rollback()
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        except FileExistsError as e:
             db.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 

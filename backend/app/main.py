@@ -23,8 +23,8 @@ manager = ConnectionManager()
 user = UserManager()
 
 
-@app.get("/api/generator/client_id")
-async def extract_url():
+@app.get("/client_id")
+async def get_id():
     u = uuid.uuid4()
     print(user.get(u))
     while user.get(u) is not None:
@@ -37,7 +37,7 @@ async def extract_url():
     return res
 
 
-@app.get("/api/base/email")
+@app.get("/email")
 async def email(client_id: str, email: str):
     ret = user.append(client_id, "email", email)
     res = {}
@@ -52,7 +52,7 @@ async def email(client_id: str, email: str):
     return res
 
 
-@app.post("/api/youtube/url")
+@app.post("/url")
 async def extract_url(
     db: Annotated[Session, Depends(get_db)], yt_url: str, client_id: str
 ):
@@ -64,7 +64,7 @@ async def extract_url(
     # 这是当前用户的历史消息
     print(history_list)
 
-    video = utils.pipeline(db=db, yt_url=yt_url)
+    utils.pipeline(db=db, yt_url=yt_url)
 
     chat = Chat()
     chat.role = "user"
@@ -85,7 +85,7 @@ async def extract_url(
     return res
 
 
-@app.post("/api/youtube/sayToAI")
+@app.post("/sayToAI")
 async def say_to_ai(
     db: Annotated[Session, Depends(get_db)],
     file: UploadFile,
