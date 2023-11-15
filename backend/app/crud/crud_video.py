@@ -1,7 +1,10 @@
+import sys
+sys.path.append("/Users/tao/Documents/harmone_ai/backend/app")
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Video
+from models import Video
 
 
 class CRUDVideo:

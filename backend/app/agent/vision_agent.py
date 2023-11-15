@@ -1,11 +1,13 @@
 import base64
+import sys
+sys.path.append("/Users/tao/Documents/harmone_ai/backend/app")
 from dotenv import load_dotenv
 
 import openai
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app import crud
+from crud import crud_audio as audiotext, crud_frame as frame
 
 
 def vision_agent(
@@ -27,7 +29,7 @@ def vision_agent(
     load_dotenv()
 
     start_sec = max(1, end_sec - context_len)
-    frames_context = crud.frame.get(
+    frames_context = frame.get(
         db=db, video_id=video_id, start_sec=start_sec, end_sec=end_sec
     )
     if not frames_context:
@@ -42,7 +44,7 @@ def vision_agent(
             # Encode the image to base64 strings and replace
             frames_context[idx] = encode_image(file_path)
 
-    res = crud.audiotext.get(
+    res = audiotext.get(
         db=db, video_id=video_id, start_sec=start_sec, end_sec=end_sec
     )
     if not res:

@@ -1,9 +1,10 @@
 import os
-
+import sys
+sys.path.append("/Users/tao/Documents/harmone_ai/backend/app")
 from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
 
-from app.models import Frame
+from models import Frame
 
 
 class CRUDFrame:

@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/Users/tao/Documents/harmone_ai/backend/app")
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -5,8 +7,9 @@ from sqlalchemy.orm import Session
 from .download import dl_video_audio, extract_vid_info
 from .text_transcript import audio_to_text, format_audio
 from .extract_frames import extract_frames
-from app import crud
-
+from crud import crud_video
+from crud import crud_audio
+from crud import crud_frame
 
 def pipeline(db: Session, yt_url: str):
     """Extracts frames and audio of YouTube video from the given URL
@@ -18,7 +21,7 @@ def pipeline(db: Session, yt_url: str):
 
     # download youtube video and audio separately
 
-    video = crud.video.get(db=db, yt_url=yt_url)
+    video = crud_video.video.get(db=db, yt_url=yt_url)
     if not video:
         vid_file = "yt_vid"  # do not add extensions (.mp4, etc) here
         audio_file = "yt_audio"  # do not add extensions (.mp4, etc) here
@@ -26,7 +29,7 @@ def pipeline(db: Session, yt_url: str):
         vid_info = extract_vid_info(yt_url)
 
         try:
-            created_vid_obj = crud.video.create(db=db, video=vid_info, yt_url=yt_url)
+            created_vid_obj = crud_video.video.create(db=db, video=vid_info, yt_url=yt_url)
         except IntegrityError as e:
             db.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -42,7 +45,7 @@ def pipeline(db: Session, yt_url: str):
         # format audio as text for adding to PostgreSQL DB
         audio_texts = format_audio(transcription)
         try:
-            crud.audiotext.create(
+            crud_audio.audiotext.create(
                 db=db, video_id=created_vid_obj.id, audio_texts=audio_texts
             )
         except IntegrityError as e:
@@ -57,7 +60,7 @@ def pipeline(db: Session, yt_url: str):
         output_dir = f"frames/{vid_info['url']}"
         try:
             extract_frames(video_path, output_dir)
-            crud.frame.create(db=db, vid_id=created_vid_obj.id, output_dir=output_dir)
+            crud_frame.frame.create(db=db, vid_id=created_vid_obj.id, output_dir=output_dir)
         except IntegrityError as e:
             db.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

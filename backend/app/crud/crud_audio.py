@@ -1,6 +1,9 @@
+import sys
+sys.path.append("/Users/tao/Documents/harmone_ai/backend/app")
+
 from sqlalchemy import select, func, or_, and_
 from sqlalchemy.orm import Session
-from app.models import AudioText
+from models import AudioText
 
 
 class CRUDAudioText:
@@ -8,7 +11,7 @@ class CRUDAudioText:
         self.model = model
 
     def get(
-        self, db: Session, video_id: int, start_sec: int, end_sec: int
+            self, db: Session, video_id: int, start_sec: int, end_sec: int
     ) -> list[str]:
         overlap_duration = func.least(AudioText.end_time, end_sec) - func.greatest(
             AudioText.start_time, start_sec
@@ -86,7 +89,7 @@ class CRUDAudioText:
         return completely_overlapped_intervals
 
     def create(
-        self, db: Session, video_id: int, audio_texts: list[tuple]
+            self, db: Session, video_id: int, audio_texts: list[tuple]
     ) -> list[AudioText]:
         rows = []
         for start_t, end_t, txt in audio_texts:

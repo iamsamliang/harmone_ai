@@ -8,16 +8,18 @@ from fastapi.staticfiles import StaticFiles
 from openai.resources.audio.speech import HttpxBinaryResponseContent
 from sqlalchemy.orm import Session
 
-from .connectionManager import ConnectionManager
-from .user import UserManager
-from .chat import Chat
-from .database import get_db
-from app import utils, agent, crud
-from app.utils.text_transcript import audio_to_text
+from connectionManager import ConnectionManager
+from user import UserManager
+from chat import Chat
+from database import get_db
+from utils import pipeline
+from agent import vision_agent
+from crud.crud_video import video as vd
+from utils.text_transcript import audio_to_text
 
 app = FastAPI()
 
-# app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 manager = ConnectionManager()
 user = UserManager()
@@ -64,19 +66,12 @@ async def extract_url(
     # 这是当前用户的历史消息
     print(history_list)
 
-    utils.pipeline(db=db, yt_url=yt_url)
+    await pipeline(db=db, yt_url=yt_url)
 
-    chat = Chat()
-    chat.role = "user"
-    chat.content = yt_url
-    chat.is_url = True
+    chat = Chat(chat_id=uuid.uuid4(), role="user", content=yt_url, is_url=True)
     user.append_history(client_id, chat)
 
-    chat = Chat()
-    chat.role = "user"
-    # chat.content = parsed_text
-    chat.content = "test"
-    chat.is_url = False
+    chat = Chat(chat_id=uuid.uuid4(), role="user", content="test", is_url=False)
     user.append_history(client_id, chat)
 
     res["code"] = 0
@@ -106,29 +101,23 @@ async def say_to_ai(
 
     context_len = max(1, context_len)  # defined in seconds, whole number
 
-    chat = Chat()
-    chat.role = "user"
-    chat.content = yt_url
-    chat.is_url = True
+    chat = Chat(chat_id=uuid.uuid4(), role="user", content=yt_url, is_url=True)
     user.append_history(client_id, chat)
 
     user_input = audio_to_text(file)
 
-    chat = Chat()
-    chat.role = "user"
-    chat.content = user_input
-    chat.is_url = False
+    chat = Chat(chat_id=uuid.uuid4(), role="user", content=user_input, is_url=False)
     user.append_history(client_id, chat)
 
     # agent needs yt_url unless there's a better way to structure/remember this
-    video = crud.video.get(db=db, yt_url=yt_url)
+    video = vd.get(db=db, yt_url=yt_url)
     if not video:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Video w/ id {video.id} doesn't exist",
         )
 
-    response = agent.vision_agent(
+    response = vision_agent(
         db=db,
         video_id=video.id,
         user_input=user_input,
@@ -145,10 +134,7 @@ async def say_to_ai(
 # todo 如果有反馈信息需要返回给extensions，随时随地调用say_to_user推送给extensions
 # push voice to extensions
 async def say_to_user(client_id: str, text: str, audio: HttpxBinaryResponseContent):
-    chat = Chat()
-    chat.role = "assistant"
-    chat.content = text
-    chat.is_url = False
+    chat = Chat(chat_id=uuid.uuid4(), role="assistant", content=text, is_url=False)
     user.append_history(client_id, chat)
 
     audio_file = str(uuid.uuid4()) + ".mp3"
@@ -179,7 +165,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
         manager.disconnect(client_id)
 
 
-# if __name__ == "__main__":
-#     import uvicorn
-#
-#     uvicorn.run(app, host="127.0.0.1", port=8087)
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8087)
