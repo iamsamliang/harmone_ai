@@ -1,10 +1,10 @@
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from models.models import Base
+from app.models.models import Base
 
 load_dotenv()
 db_url = os.getenv("DATABASE_URL")

@@ -8,14 +8,12 @@ from fastapi.staticfiles import StaticFiles
 from openai.resources.audio.speech import HttpxBinaryResponseContent
 from sqlalchemy.orm import Session
 
-from connectionManager import ConnectionManager
-from user import UserManager
-from chat import Chat
-from database import get_db
-import utils
-import agent
-import crud
-from utils.text_transcript import audio_to_text
+from .connectionManager import ConnectionManager
+from .user import UserManager
+from .chat import Chat
+from .database import get_db
+from app import utils, agent, crud
+from app.utils.text_transcript import audio_to_text
 
 app = FastAPI()
 
@@ -56,7 +54,7 @@ async def email(client_id: str, email: str):
 
 @app.post("/api/youtube/url")
 async def extract_url(
-        db: Annotated[Session, Depends(get_db)], yt_url: str, client_id: str
+    db: Annotated[Session, Depends(get_db)], yt_url: str, client_id: str
 ):
     res = {}
     res["code"] = -1
@@ -89,13 +87,13 @@ async def extract_url(
 
 @app.post("/api/youtube/sayToAI")
 async def say_to_ai(
-        db: Annotated[Session, Depends(get_db)],
-        file: UploadFile,
-        client_id: str,
-        yt_url: str,
-        end_sec: int,
-        context_len: int = 10,
-        reactor: str = "iShowSpeed",
+    db: Annotated[Session, Depends(get_db)],
+    file: UploadFile,
+    client_id: str,
+    yt_url: str,
+    end_sec: int,
+    context_len: int = 10,
+    reactor: str = "iShowSpeed",
 ):
     res = {}
     res["code"] = -1
@@ -169,6 +167,7 @@ async def send_message(client_id: str, data: str):
         manager.disconnect(client_id)
         return False
     return True
+
 
 @app.websocket("/api/ws")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):

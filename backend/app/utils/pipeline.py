@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from .download import dl_video_audio, extract_vid_info
 from .text_transcript import audio_to_text, format_audio
 from .extract_frames import extract_frames
-from .crud import crud
+from app import crud
+
 
 def pipeline(db: Session, yt_url: str):
     """Extracts frames and audio of YouTube video from the given URL

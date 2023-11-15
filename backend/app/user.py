@@ -1,10 +1,10 @@
-from chat import Chat
 import uuid
+from .chat import Chat
 
 
 class UserManager:
     def __init__(self):
-        self.user: dict[str: dict] = {}
+        self.user: dict[str:dict] = {}
 
     async def set(self, id: str, data: dict):
         if id == "":
@@ -83,8 +83,8 @@ class UserManager:
             return True
         for i in range(len(self.user[id]["history"])):
             if (
-                    self.user[id]["history"][i] == chat
-                    or self.user[id]["history"][i].chat_id == chat.chat_id
+                self.user[id]["history"][i] == chat
+                or self.user[id]["history"][i].chat_id == chat.chat_id
             ):
                 self.user[id]["history"].pop(i)
                 break
