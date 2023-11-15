@@ -179,7 +179,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
         manager.disconnect(client_id)
 
 
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="127.0.0.1", port=8087)
+# if __name__ == "__main__":
+#     import uvicorn
+#
+#     uvicorn.run(app, host="127.0.0.1", port=8087)
