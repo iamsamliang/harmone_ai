@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -33,7 +35,7 @@ def pipeline(db: Session, yt_url: str):
 
         # convert audio to text
         audio_path = audio_file + ".webm"
-        transcription = audio_to_text(audio_path).dict()
+        transcription = audio_to_text(audio_path).model_dump()
         # Save as JSON
         # json_path = "vid_transcript.json"
         # with open(json_path, "w") as f:
@@ -54,7 +56,7 @@ def pipeline(db: Session, yt_url: str):
 
         # convert yt video to frames per second. Store in directory "frames"
         video_path = vid_file + ".webm"
-        output_dir = f"frames/{vid_info['url']}"
+        output_dir = f"frames/{str(uuid.uuid4())}"
         try:
             extract_frames(video_path, output_dir)
             crud.frame.create(db=db, vid_id=created_vid_obj.id, output_dir=output_dir)

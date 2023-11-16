@@ -64,7 +64,7 @@ async def extract_url(
     # 这是当前用户的历史消息
     print(history_list)
 
-    await utils.pipeline(db=db, yt_url=yt_url)
+    utils.pipeline(db=db, yt_url=yt_url)
 
     chat = Chat(chat_id=uuid.uuid4(), role="user", content=yt_url, is_url=True)
     user.append_history(client_id, chat)
@@ -123,6 +123,8 @@ async def say_to_ai(
         context_len=context_len,
         reactor=reactor,
     )
+
+    print(response)
 
     say_to_user(client_id, response.input, response)
 

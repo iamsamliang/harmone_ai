@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "harmone-ai"
+name = "yt-ai"
 version = "0.1.0"
 description = ""
 license = "Proprietary"
 authors = ["Sam Liang <iamsamliang8@gmail.com>"]
-readme = "README.md"
-packages = [{include = "backend"}]
+readme = "../README.md"
+packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "~3.11.6"
@@ -20,6 +20,10 @@ requests = "2.31.0"
 sqlalchemy = "2.0.23"
 transformers = "4.34.0"
 uvicorn = "0.24.0.post1"
+sqlalchemy-cockroachdb = "^2.0.1"
+psycopg2 = "^2.9.9"
+python-multipart = "^0.0.6"
+yt-dlp = "^2023.11.16"
 
 
 [build-system]
