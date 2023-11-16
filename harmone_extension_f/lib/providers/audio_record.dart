@@ -27,20 +27,21 @@ class AudioRecord with ChangeNotifier {
     
     window.navigator.getUserMedia(audio: true).then((stream) async {
       await _recordingSession.startRecorder(
-      toFile: pathToAudio,
-      // codec: Codec.pcm16WAV,
-    );
+        toFile: pathToAudio,
+        // codec: Codec.pcm16WAV,
+      );
+      isRecording = true;
+
       _recorderSubscription = _recordingSession.onProgress!.listen((e) {
         double? decibels = e.decibels;
-        decibels = 60;
         print("decibels");
         print(decibels);
+        decibels = 60;
         if (decibels! > minVolume) {
           if (!isRecording) {
-            isRecording = true;
             startRecording();
           }
-          _silenceTimer?.cancel();
+          _resetSilenceTimer();
         } else {
           _silenceTimer = Timer(Duration(seconds: 1), () {
             if (isRecording) {
@@ -58,6 +59,7 @@ class AudioRecord with ChangeNotifier {
   Future<void> startRecording() async {
     print("start recording");
     if(!isRecording) {
+      isRecording = true;
       await _recordingSession.startRecorder(
         toFile: pathToAudio,
         // codec: Codec.pcm16WAV,
@@ -69,21 +71,25 @@ class AudioRecord with ChangeNotifier {
       if (isRecording) {
         stopRecording();
         startRecording();
-      } else {
-        isRecording = true;
-      }   
+      }
+    });
+  }
+
+  void _resetSilenceTimer() {
+    _silenceTimer?.cancel();
+    _silenceTimer = Timer(const Duration(seconds: 1), () {
+      if (isRecording) {
+        stopRecording();
+      }
     });
   }
 
   Future<void> stopRecording() async {
     print("stop recording");
     var file = _recordingSession.stopRecorder();
+    print("file");
+    print(file);
     isRecording = false;
     _silenceTimer?.cancel();
-  }
-
-  void monitorAudioLevel() {
-    
-    // _recorderSubscription.cancel();
   }
 }
