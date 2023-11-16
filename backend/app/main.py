@@ -7,6 +7,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from openai.resources.audio.speech import HttpxBinaryResponseContent
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from .connectionManager import ConnectionManager
 from .user import UserManager
@@ -64,18 +65,22 @@ async def extract_url(
     # 这是当前用户的历史消息
     print(history_list)
 
-    utils.pipeline(db=db, yt_url=yt_url)
+    try:
+        utils.pipeline(db=db, yt_url=yt_url)
+        db.commit()
+        chat = Chat(chat_id=uuid.uuid4(), role="user", content=yt_url, is_url=True)
+        user.append_history(client_id, chat)
 
-    chat = Chat(chat_id=uuid.uuid4(), role="user", content=yt_url, is_url=True)
-    user.append_history(client_id, chat)
+        chat = Chat(chat_id=uuid.uuid4(), role="user", content="test", is_url=False)
+        user.append_history(client_id, chat)
 
-    chat = Chat(chat_id=uuid.uuid4(), role="user", content="test", is_url=False)
-    user.append_history(client_id, chat)
-
-    res["code"] = 0
-    res["msg"] = "success"
-    res["data"] = ""
-    return res
+        res["code"] = 0
+        res["msg"] = "success"
+        res["data"] = ""
+        return res
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @app.post("/sayToAI")
