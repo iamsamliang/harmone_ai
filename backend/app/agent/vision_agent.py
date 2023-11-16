@@ -78,7 +78,7 @@ def vision_agent(
         input=text,
     )
 
-    return response
+    return response, text
 
 
 user_input = "nothing"

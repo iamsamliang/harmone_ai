@@ -86,7 +86,7 @@ async def extract_url(
 @app.post("/sayToAI")
 async def say_to_ai(
     db: Annotated[Session, Depends(get_db)],
-    file: UploadFile,
+    # file: UploadFile,
     client_id: str,
     yt_url: str,
     end_sec: int,
@@ -107,7 +107,8 @@ async def say_to_ai(
     chat = Chat(chat_id=uuid.uuid4(), role="user", content=yt_url, is_url=True)
     user.append_history(client_id, chat)
 
-    user_input = audio_to_text(file)
+    # user_input = audio_to_text(file)
+    user_input = "Oh my god. What is Draymond Green doing right now ?! NO ONE EVEN SCORED A POINT YET and they're fighting!"
 
     chat = Chat(chat_id=uuid.uuid4(), role="user", content=user_input, is_url=False)
     user.append_history(client_id, chat)
@@ -120,20 +121,24 @@ async def say_to_ai(
             detail=f"Video w/ id {video.id} doesn't exist",
         )
 
-    response = agent.vision_agent(
-        db=db,
-        video_id=video.id,
-        user_input=user_input,
-        end_sec=end_sec,
-        context_len=context_len,
-        reactor=reactor,
-    )
+    try:
+        response, text = agent.vision_agent(
+            db=db,
+            video_id=video.id,
+            user_input=user_input,
+            end_sec=end_sec,
+            context_len=context_len,
+            reactor=reactor,
+        )
 
-    print(response)
+        # await say_to_user(client_id, text, response)
 
-    say_to_user(client_id, response.input, response)
-
-    return res
+        return res
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
 
 # todo 如果有反馈信息需要返回给extensions，随时随地调用say_to_user推送给extensions
@@ -146,8 +151,7 @@ async def say_to_user(client_id: str, text: str, audio: HttpxBinaryResponseConte
     audio_full_path = os.path.join(os.getcwd(), os.path.join("static", audio_file))
     audio.stream_to_file(audio_full_path)
     audio.close()
-    # todo "http://127.0.0.1:8087/" later replace
-    await send_message(client_id, audio_file)
+    # await send_message(client_id, audio_file)
 
 
 # push message to extensions
