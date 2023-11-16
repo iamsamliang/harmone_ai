@@ -40,6 +40,7 @@ dependencies:
   html: ^0.15.4
   flutter_sound: ^9.2.13
   permission_handler: ^11.0.1
+  http: ^1.1.0
 
 dev_dependencies:
   flutter_test:

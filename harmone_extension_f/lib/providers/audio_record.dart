@@ -3,6 +3,8 @@ import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:js_util' as js_util;
+import 'dart:js' as js;
 
 class AudioRecord with ChangeNotifier {
   Timer? _silenceTimer;
@@ -91,5 +93,29 @@ class AudioRecord with ChangeNotifier {
     print(file);
     isRecording = false;
     _silenceTimer?.cancel();
+  }
+}
+
+void getCurrentYoutubeTimestamp() async {
+  print("calling getCurrentYoutubeTimestamp");
+
+  var sendMessage =
+      js_util.getProperty(js.context['chrome']['runtime'], 'sendMessage');
+  var response =
+      await js_util.promiseToFuture(js_util.callMethod(sendMessage, [], [
+    {
+      'action': 'getYoutubeVideoCurrentTime',
+    },
+    js.allowInterop((result) {
+      print('Current video time: $result');
+    })
+  ]));
+}
+
+void upload_audio_files() async {
+  getCurrentYoutubeTimestamp();
+
+  Map<String, dynamic>  data = {
+    "url": ""
   }
 }

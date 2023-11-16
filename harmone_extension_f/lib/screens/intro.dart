@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'dart:js_util' as js_util;
 import 'package:harmone_extension_f/providers/chrome_api.dart' as chrome_api;
 import 'dart:js' as js;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class IntroPage extends StatefulWidget {
   const IntroPage({super.key});
@@ -18,7 +20,24 @@ class IntroPage extends StatefulWidget {
 }
 
 class _IntroPageState extends State<IntroPage> {
+  late String ytUrl;
 
+
+  Future<http.Response> createPostRequest(String url, ) async {
+    var data = {
+      "ytUrl": ytUrl,
+      "timestamp": xxx,
+      "audio_files": yyy,
+    };
+    
+    return await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(data),
+    );
+  }
   
   void sendMessageToContentScript() async {
     var sendMessage =
@@ -56,9 +75,10 @@ class _IntroPageState extends State<IntroPage> {
             active: true, lastFocusedWindow: true)),
       );
       if (tabs.isNotEmpty && tabs.first.url.isNotEmpty) {
-        Provider.of<Url>(context, listen: false).updateURL(tabs.first.url);
-        print('Current tab URL: ${tabs.first.url}');
-        return tabs.first.url;
+        ytUrl = tabs.first.url;
+        Provider.of<Url>(context, listen: false).updateURL(ytUrl);
+        print('Current tab URL: ${ytUrl}');
+        return ytUrl;
       } else {
         throw Exception('No tabs found');
       }
@@ -66,8 +86,6 @@ class _IntroPageState extends State<IntroPage> {
       throw Exception('Failed to get current tab URL: $e');
     }
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
