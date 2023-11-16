@@ -1,6 +1,3 @@
-import sys
-sys.path.append("/Users/tao/Documents/harmone_ai/backend/app")
-
 from sqlalchemy import select, func, or_, and_
 from sqlalchemy.orm import Session
 from models import AudioText

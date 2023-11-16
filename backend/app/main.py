@@ -66,7 +66,7 @@ async def extract_url(
     # 这是当前用户的历史消息
     print(history_list)
 
-    await pipeline(db=db, yt_url=yt_url)
+    pipeline(db=db, yt_url=yt_url)
 
     chat = Chat(chat_id=uuid.uuid4(), role="user", content=yt_url, is_url=True)
     user.append_history(client_id, chat)

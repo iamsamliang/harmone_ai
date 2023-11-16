@@ -1,5 +1,3 @@
-import sys
-sys.path.append("/Users/tao/Documents/harmone_ai/backend/app")
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session

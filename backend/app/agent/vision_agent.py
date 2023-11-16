@@ -1,6 +1,4 @@
 import base64
-import sys
-sys.path.append("/Users/tao/Documents/harmone_ai/backend/app")
 from dotenv import load_dotenv
 
 import openai
