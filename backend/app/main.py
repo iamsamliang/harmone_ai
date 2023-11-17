@@ -23,6 +23,31 @@ app = FastAPI()
 manager = ConnectionManager()
 user = UserManager()
 
+### Testing with this URL from YouTube: https://www.youtube.com/watch?v=LQb8dK4MC-E&t=2s
+
+
+@app.post("/user")
+async def create_user(
+    db: Annotated[Session, Depends(get_db)], email: str, first_name: str, last_name: str
+):
+    crud.user.create(db=db, email=email, first_name=first_name, last_name=last_name)
+
+
+@app.get("/user/{id}")
+async def get_user(db: Annotated[Session, Depends(get_db)], id: int):
+    user = crud.user.get(db=db, id=id)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User w/ id {user.id} doesn't exist",
+        )
+    return {
+        "id": user.id,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+    }
+
 
 @app.get("/client_id")
 async def get_id():

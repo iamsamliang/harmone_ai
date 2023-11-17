@@ -20,7 +20,7 @@ class CRUDVideo:
         """
         return db.scalars(select(Video).filter_by(url=yt_url).limit(1)).first()
 
-    def create(self, db: Session, video: dict, yt_url: str) -> Video:
+    def create(self, db: Session, video: dict) -> Video:
         """Assumes we only create a video that doesn't exist and add to DB"""
         vid_obj = Video(
             title=video["title"],

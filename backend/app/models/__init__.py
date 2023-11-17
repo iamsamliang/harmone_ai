@@ -1,1 +1,1 @@
-from .models import Video, AudioText, Frame
+from .models import Video, AudioText, Frame, User
