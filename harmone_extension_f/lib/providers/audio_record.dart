@@ -111,11 +111,3 @@ void getCurrentYoutubeTimestamp() async {
     })
   ]));
 }
-
-void upload_audio_files() async {
-  getCurrentYoutubeTimestamp();
-
-  Map<String, dynamic>  data = {
-    "url": ""
-  }
-}
