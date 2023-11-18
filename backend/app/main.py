@@ -13,7 +13,7 @@ from .connectionManager import ConnectionManager
 from .user import UserManager
 from .chat import Chat
 from .database import get_db
-from app import utils, agent, crud
+from app import utils, agent, crud, schemas
 from app.utils.text_transcript import audio_to_text
 
 app = FastAPI()
@@ -32,11 +32,21 @@ user = UserManager()
 ### Testing with this URL from YouTube: https://www.youtube.com/watch?v=LQb8dK4MC-E&t=2s
 
 
+@app.get("/")
+async def home():
+    return {"data": "success"}
+
+
 @app.post("/user")
 async def create_user(
-    db: Annotated[Session, Depends(get_db)], email: str, first_name: str, last_name: str
+    db: Annotated[Session, Depends(get_db)], user_data: schemas.UserCreateRequest
 ):
-    crud.user.create(db=db, email=email, first_name=first_name, last_name=last_name)
+    crud.user.create(
+        db=db,
+        email=user_data.email,
+        first_name=user_data.first_name,
+        last_name=user_data.last_name,
+    )
 
 
 @app.get("/user/{id}")
