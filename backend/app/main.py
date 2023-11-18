@@ -2,9 +2,9 @@ import os
 import uuid
 from typing import Annotated
 
-from fastapi import FastAPI, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi import Depends, HTTPException, status
-from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from openai.resources.audio.speech import HttpxBinaryResponseContent
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -17,6 +17,12 @@ from app import utils, agent, crud
 from app.utils.text_transcript import audio_to_text
 
 app = FastAPI()
+
+allowed_origins = ["https://harmone.framer.website"]
+
+app.add_middleware(
+    CORSMiddleware, allow_origins=allowed_origins, allow_methods=["GET", "POST"]
+)
 
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 
