@@ -41,12 +41,20 @@ async def home():
 async def create_user(
     db: Annotated[Session, Depends(get_db)], user_data: schemas.UserCreateRequest
 ):
-    crud.user.create(
-        db=db,
-        email=user_data.email,
-        first_name=user_data.first_name,
-        last_name=user_data.last_name,
-    )
+    try:
+        crud.user.create(
+            db=db,
+            email=user_data.email,
+            first_name=user_data.first_name,
+            last_name=user_data.last_name,
+        )
+        db.commit()
+        return {"data": "success"}
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @app.get("/user/{id}")
