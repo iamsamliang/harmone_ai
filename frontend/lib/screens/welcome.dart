@@ -17,7 +17,10 @@ class _WelcomePageState extends State<WelcomePage> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF83a4d4), Color(0xFFb6fbff)],
+            colors: [
+              Color(0xFF232526),
+              Color(0xFF414345)
+            ], // Dark gradient background
           ),
         ),
         child: Center(
@@ -29,6 +32,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 const Text(
                   'Welcome',
                   style: TextStyle(
+                    // fontFamily: 'Montserrat', // Use the Montserrat font
                     fontSize: 56,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -41,15 +45,22 @@ class _WelcomePageState extends State<WelcomePage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),  // Increased spacing for a cleaner look
-                Material(  // Wrap ElevatedButton with Material
-                  elevation: 5.0,  // Add shadow to button
-                  borderRadius: BorderRadius.circular(30.0),  // Rounded corners
+                const SizedBox(height: 32),
+                Material(
+                  elevation:
+                      10.0, // Increased elevation for a more pronounced shadow
+                  borderRadius: BorderRadius.circular(30.0),
                   child: Container(
-                    width: double.infinity,  // Make the button wider
-                    height: 60,  // Increase button height for a larger tap target
+                    width: double.infinity,
+                    height: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(30.0),
+                      gradient: const LinearGradient(
+                        // Add a subtle gradient to the button
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF646F80), Color(0xFF28313B)],
+                      ),
                     ),
                     child: ElevatedButton(
                       onPressed: () {
@@ -60,8 +71,10 @@ class _WelcomePageState extends State<WelcomePage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.white,  // Background color
-                        onPrimary: const Color(0xFF83a4d4),  // Text color
+                        primary: Colors
+                            .transparent, // Make button background transparent
+                        shadowColor:
+                            Colors.transparent, // No shadow for the button
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
@@ -74,13 +87,13 @@ class _WelcomePageState extends State<WelcomePage> {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF83a4d4),
+                              color: Colors.white,
                             ),
                           ),
                           SizedBox(width: 10),
                           Icon(
                             Icons.arrow_forward,
-                            color: Color(0xFF83a4d4),
+                            color: Colors.white,
                           ),
                         ],
                       ),
