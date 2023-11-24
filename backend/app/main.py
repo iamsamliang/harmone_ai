@@ -137,8 +137,8 @@ async def say_to_ai(
     client_id: Annotated[str, Form()],
     yt_url: Annotated[str, Form()],
     end_sec: Annotated[int, Form()],
-    context_len: Annotated[int, Form(10)],
-    reactor: Annotated[str, Form("iShowSpeed")],
+    context_len: int = Form(10),
+    reactor: str = Form("iShowSpeed"),
 ):
     res = {}
     res["code"] = -1
