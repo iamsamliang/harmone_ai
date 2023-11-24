@@ -11,7 +11,7 @@ class UserManager:
             return False
         if self.get(id) is None:
             self.user[id] = {}
-        if data is not None:
+        if data is None:
             return False
         for item in data:
             self.user[id][item] = data[item]
