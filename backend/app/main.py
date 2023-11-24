@@ -5,7 +5,6 @@ from typing import Annotated
 from fastapi import FastAPI, Form, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi import Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 import openai
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -16,7 +15,6 @@ from .user import UserManager
 from .chat import Chat
 from .database import get_db
 from app import utils, agent, crud, schemas
-from app.utils.text_transcript import audio_to_text
 
 app = FastAPI()
 
