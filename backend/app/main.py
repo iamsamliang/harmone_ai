@@ -7,7 +7,6 @@ from fastapi import Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import openai
-from openai.resources.audio.speech import HttpxBinaryResponseContent
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -133,9 +132,6 @@ async def extract_url(db: Annotated[Session, Depends(get_db)], request: Extract)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-class UserInput(BaseModel):
-    
-
 @app.post("/sayToAI")
 async def say_to_ai(
     db: Annotated[Session, Depends(get_db)],
@@ -144,7 +140,7 @@ async def say_to_ai(
     yt_url: Annotated[str, Form()],
     end_sec: Annotated[int, Form()],
     context_len: Annotated[int, Form(10)],
-    reactor: Annotated[str, Form("iShowSpeed")]
+    reactor: Annotated[str, Form("iShowSpeed")],
 ):
     res = {}
     res["code"] = -1
@@ -159,18 +155,18 @@ async def say_to_ai(
 
     chat = Chat(chat_id=str(uuid.uuid4()), role="user", content=yt_url, is_url=True)
     user.append_history(client_id, chat)
-    
+
     try:
         # Rewind the file to the beginning if it has been read before
         await file.seek(0)
 
         user_input = openai.audio.transcriptions.create(
-            model="whisper-1", 
+            model="whisper-1",
             file=file.file,  # Using the file-like object directly
             language="en",
-            response_format="text"
+            response_format="text",
         )
-        
+
         assert type(user_input) == str
         # user_input = "Oh my god. What is Draymond Green doing right now ?! NO ONE EVEN SCORED A POINT YET and they're fighting!"
 
@@ -197,14 +193,16 @@ async def say_to_ai(
         )
 
         # prepare AI output to extension
-        chat = Chat(chat_id=str(uuid.uuid4()), role="assistant", content=text, is_url=False)
+        chat = Chat(
+            chat_id=str(uuid.uuid4()), role="assistant", content=text, is_url=False
+        )
         user.append_history(client_id, chat)
 
         audio_file = str(uuid.uuid4()) + ".mp3"
         audio_full_path = os.path.join(os.getcwd(), os.path.join("static", audio_file))
         response.stream_to_file(audio_full_path)
         response.close()
-        
+
         # return AI output to extension
         await manager.send_personal_message(client_id, f"{audio_file}")
     except WebSocketDisconnect:
@@ -214,7 +212,6 @@ async def say_to_ai(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
-        
 
 
 # todo 如果有反馈信息需要返回给extensions，随时随地调用say_to_user推送给extensions
