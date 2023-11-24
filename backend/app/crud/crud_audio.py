@@ -68,6 +68,7 @@ class CRUDAudioText:
         ###################################################################################################
 
         # putting the transcriptions in order by time
+        assert type(completely_overlapped_intervals) == list
         overlap_len = len(intervals_with_largest_overlap)
         if overlap_len == 1:
             elem = intervals_with_largest_overlap[0]

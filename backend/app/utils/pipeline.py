@@ -28,7 +28,7 @@ def pipeline(db: Session, yt_url: str):
         vid_info = extract_vid_info(yt_url)
 
         try:
-            created_vid_obj = crud.video.create(db=db, video=vid_info, yt_url=yt_url)
+            created_vid_obj = crud.video.create(db=db, video=vid_info)
         except IntegrityError as e:
             db.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

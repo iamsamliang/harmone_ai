@@ -1,9 +1,10 @@
+from typing import Any
 from .chat import Chat
 
 
 class UserManager:
     def __init__(self):
-        self.user: dict[str:dict] = {}
+        self.user: dict[str, dict] = {}
 
     def set(self, id: str, data: dict):
         if id == "":
@@ -19,7 +20,7 @@ class UserManager:
     def get(self, id: str):
         return self.user.get(id)
 
-    def append(self, id: str, key: str, value: any):
+    def append(self, id: str, key: str, value: Any):
         if id == "":
             return False
         if self.get(id) is None:
@@ -86,6 +87,7 @@ class UserManager:
                 break
 
     def get_all_history(self, id: str):
-        if self.user.get(id) is not None:
+        if self.user.get(id) is None:
             return None
+
         return self.user.get(id).get("history")

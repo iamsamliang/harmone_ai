@@ -1,4 +1,5 @@
 import os
+from typing import Sequence
 
 from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
@@ -25,6 +26,9 @@ class CRUDFrame:
             .order_by(Frame.timestamp)
         ).all()
 
+        assert type(frames[0]) == str
+        assert type(frames) == list
+
         return frames
 
     def create(self, db: Session, vid_id: int, output_dir: str) -> list[Frame]:
@@ -41,4 +45,3 @@ class CRUDFrame:
 
 
 frame = CRUDFrame(Frame)
-frame.get

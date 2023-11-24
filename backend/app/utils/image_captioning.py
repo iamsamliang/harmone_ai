@@ -23,7 +23,7 @@ def get_captions(image_dir: str, device: str):
     # ]
 
     dataset = load_dataset("imagefolder", data_dir=image_dir)
-    dataset = dataset["train"]["image"]
+    dataset = dataset["train"]["image"]  # type: ignore
     pipe = pipeline(
         "image-to-text", model="Salesforce/blip-image-captioning-base", device=device
     )
