@@ -1,16 +1,19 @@
 import os
 import uuid
+import json
+from io import BytesIO
 from typing import Annotated
 
 from fastapi import FastAPI, Form, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi import Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 import openai
+from openai.resources.audio.speech import HttpxBinaryResponseContent  # type: ignore
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from .connectionManager import ConnectionManager
+from .connection_manager import ConnectionManager
 from .user import UserManager
 from .chat import Chat
 from .database import get_db
@@ -130,37 +133,29 @@ async def extract_url(db: Annotated[Session, Depends(get_db)], request: Extract)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@app.post("/sayToAI")
 async def say_to_ai(
-    db: Annotated[Session, Depends(get_db)],
-    file: UploadFile,
-    client_id: Annotated[str, Form()],
-    yt_url: Annotated[str, Form()],
-    end_sec: Annotated[int, Form()],
-    context_len: int = Form(10),
-    reactor: str = Form("iShowSpeed"),
-):
-    res = {}
-    res["code"] = -1
-    res["msg"] = "error"
-    res["data"] = ""
-
+    db: Session,
+    file: bytes,
+    client_id: str,
+    yt_url: str,
+    end_sec: int,
+    context_len: int = 10,
+    reactor: str = "iShowSpeed",
+) -> tuple[HttpxBinaryResponseContent, str]:
     # end_sec is the time in the video when the user started talking. Needs to be converted to seconds
     # round to the nearest second, using round() function
     end_sec = max(2, end_sec)
-
     context_len = max(1, context_len)  # defined in seconds, whole number
 
     chat = Chat(chat_id=str(uuid.uuid4()), role="user", content=yt_url, is_url=True)
     user.append_history(client_id, chat)
 
     try:
-        # Rewind the file to the beginning if it has been read before
-        await file.seek(0)
+        file_like = BytesIO(file)
 
         user_input = openai.audio.transcriptions.create(
             model="whisper-1",
-            file=file.file,  # Using the file-like object directly
+            file=file_like,  # Using the file-like object directly
             language="en",
             response_format="text",
         )
@@ -176,10 +171,7 @@ async def say_to_ai(
         # agent needs yt_url unless there's a better way to structure/remember this
         video = crud.video.get(db=db, yt_url=yt_url)
         if not video:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Video w/ url {yt_url} doesn't exist",
-            )
+            raise Exception(f"Video w/ url {yt_url} doesn't exist")
 
         response, text = agent.vision_agent(
             db=db,
@@ -190,26 +182,66 @@ async def say_to_ai(
             reactor=reactor,
         )
 
+        assert type(text) == str
         # prepare AI output to extension
         chat = Chat(
             chat_id=str(uuid.uuid4()), role="assistant", content=text, is_url=False
         )
         user.append_history(client_id, chat)
 
-        audio_file = str(uuid.uuid4()) + ".mp3"
-        audio_full_path = os.path.join(os.getcwd(), os.path.join("static", audio_file))
-        response.stream_to_file(audio_full_path)
-        response.close()
+        # audio_file = str(uuid.uuid4()) + ".mp3"
+        # audio_full_path = os.path.join(os.getcwd(), os.path.join("static", audio_file))
+        # response.stream_to_file(audio_full_path)
+        # response.close()
+
+        return response, text
 
         # return AI output to extension
-        await manager.send_personal_message(client_id, f"{audio_file}")
+        # await manager.send_personal_message(client_id, f"{audio_file}")
     except WebSocketDisconnect:
+        raise WebSocketDisconnect
+    except Exception:
+        raise Exception
+
+
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: str):
+    await manager.connect(client_id, websocket)
+    try:
+        while True:
+            # Receive the JSON text message first
+            print("waiting to receive data")
+            text_data = await websocket.receive_text()
+            timestamp_data = json.loads(text_data)
+            end_sec = round(timestamp_data.get("timestamp"))
+            yt_url = timestamp_data.get("ytUrl")
+            print(end_sec)
+            print(yt_url)
+            print(client_id)
+
+            # Then, receive the binary audio data
+            audio_data = await websocket.receive_bytes()
+            print(type(audio_data))
+
+            for db in get_db():
+                print("processing data and returning AI output")
+                response, text = await say_to_ai(
+                    db=db,
+                    file=audio_data,
+                    client_id=client_id,
+                    yt_url=yt_url,
+                    end_sec=end_sec,
+                )
+                ai_audio = await response.aread()
+                await websocket.send_bytes(ai_audio)
+                await websocket.send_text(json.dumps({"type": "text", "data": text}))
+                print("finished")
+    except WebSocketDisconnect:
+        print("disconnecting")
         manager.disconnect(client_id)
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
+        error_message = {"type": "error", "message": str(e)}
+        await websocket.send_json(error_message)
 
 
 # todo 如果有反馈信息需要返回给extensions，随时随地调用say_to_user推送给extensions
@@ -233,13 +265,3 @@ async def say_to_ai(
 #         manager.disconnect(client_id)
 #         return False
 #     return True
-
-
-@app.websocket("/api/ws")
-async def websocket_endpoint(websocket: WebSocket, client_id: str):
-    await manager.connect(client_id, websocket)
-    try:
-        while True:
-            data = await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(client_id)

@@ -38,11 +38,13 @@ class AudioRecord with ChangeNotifier {
       startRecording();
 
       _recorderSubscription = _recordingSession.onProgress!.listen((e) {
+        // unresolved bug:
+        // e.decible always return 0
         double? decibels = e.decibels;
         print("decibels");
         print(decibels);
         decibels = 60;
-        if (decibels! > minVolume) {
+        if (decibels > minVolume) {
           if (!isRecording) {
             startRecording();
           } 

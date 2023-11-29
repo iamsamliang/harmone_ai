@@ -72,16 +72,6 @@ def vision_agent(
     result = openai.chat.completions.create(**params)
     text = result.choices[0].message.content
 
-    response = openai.audio.speech.create(
-        model="tts-1",
-        voice="nova",
-        input=text,
-    )
+    response = openai.audio.speech.create(model="tts-1", voice="nova", input=text)
 
     return response, text
-
-
-user_input = "nothing"
-reactor = "IShowSpeed"
-context_len = 2  # defined in seconds
-end_sec = max(2, 238)
