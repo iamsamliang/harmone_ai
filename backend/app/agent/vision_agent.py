@@ -7,6 +7,27 @@ from fastapi import HTTPException, status
 
 from app import crud
 
+def get_audio_highlight(segment):
+    prompt = f"Is the following audio segment from a video a highlight? If yes, summarize it.\n\nSegment: \"{segment['text']}\""
+    try:
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo-instruct",
+            prompt=prompt,
+            max_tokens=50,
+            temperature=0.3
+        )
+
+        content = response.choices[0].text.strip()
+        if content.lower().startswith("yes"):
+            summary = content[len("yes"):].strip().lstrip(',').strip()
+            return {
+                'start_time': segment['start'],
+                'highlight': summary
+            }
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
 
 def vision_agent(
     db: Session,
@@ -74,4 +95,24 @@ def vision_agent(
 
     response = openai.audio.speech.create(model="tts-1", voice="nova", input=text)
 
-    return response, text
+    # Retrieve audio transcriptions
+    transcript_segments = audio_context
+    
+    # Extract highlights from each audio segment
+    audio_highlights = [get_audio_highlight(segment) for segment in transcript_segments]
+    
+    # Filter out None values
+    audio_highlights = [highlight for highlight in audio_highlights if highlight]
+
+    highlights_info = []
+    if audio_highlights:
+        # Store highlights' information in a list
+        for highlight in audio_highlights:
+            highlights_info.append({
+                'start_time': highlight['start_time'],
+                'highlight': highlight['highlight']
+            })
+
+
+
+    return response, text, highlights_info
