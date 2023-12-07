@@ -122,4 +122,7 @@ function generateClientId() {
     );
 }
 
+function main () {
 
+}
+main()
