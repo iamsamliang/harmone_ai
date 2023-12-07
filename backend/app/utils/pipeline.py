@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from .download import dl_video_audio, extract_vid_info
 from .text_transcript import audio_to_text, format_audio
 from .extract_frames import extract_frames
-from ..crud import crud_video, crud_frame, crud_audio as crud_audiotext
+from crud import crud_video, crud_frame, crud_audio as crud_audiotext
 
 
 def pipeline(db: Session, yt_url: str):
