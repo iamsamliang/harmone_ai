@@ -1,5 +1,5 @@
 from typing import Any
-from .chat import Chat
+from chat import Chat
 
 
 class UserManager:

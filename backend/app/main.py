@@ -1,4 +1,3 @@
-import os
 import uuid
 import json
 from io import BytesIO
@@ -13,11 +12,11 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from .connection_manager import ConnectionManager
-from .user import UserManager
-from .chat import Chat
-from .database import get_db
-from app import utils, agent, crud, schemas
+from connection_manager import ConnectionManager
+from user import UserManager
+from chat import Chat
+from database import get_db
+from . import utils, agent, crud, schemas
 
 app = FastAPI()
 
@@ -265,3 +264,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
 #         manager.disconnect(client_id)
 #         return False
 #     return True
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8089)
