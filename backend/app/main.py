@@ -1,3 +1,4 @@
+import sys
 import uuid
 import json
 from io import BytesIO
@@ -11,6 +12,7 @@ from openai.resources.audio.speech import HttpxBinaryResponseContent  # type: ig
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+print(sys.path)
 
 from connection_manager import ConnectionManager
 from user import UserManager
