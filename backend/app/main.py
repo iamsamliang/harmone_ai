@@ -18,7 +18,10 @@ from connection_manager import ConnectionManager
 from user import UserManager
 from chat import Chat
 from database import get_db
-from . import utils, agent, crud, schemas
+from utils import pipeline
+from agent import vision_agent
+from schemas import UserCreateRequest
+from crud import crud_video, crud_user
 
 app = FastAPI()
 
@@ -43,10 +46,10 @@ async def home():
 
 @app.post("/user")
 async def create_user(
-    db: Annotated[Session, Depends(get_db)], user_data: schemas.UserCreateRequest
+    db: Annotated[Session, Depends(get_db)], user_data: UserCreateRequest
 ):
     try:
-        crud.user.create(
+        crud_user.create(
             db=db,
             email=user_data.email,
             first_name=user_data.first_name,
@@ -63,7 +66,7 @@ async def create_user(
 
 @app.get("/user/{id}")
 async def get_user(db: Annotated[Session, Depends(get_db)], id: int):
-    user = crud.user.get(db=db, id=id)
+    user = crud_user.get(db=db, id=id)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -170,11 +173,11 @@ async def say_to_ai(
         user.append_history(client_id, chat)
 
         # agent needs yt_url unless there's a better way to structure/remember this
-        video = crud.video.get(db=db, yt_url=yt_url)
+        video = crud_video.get(db=db, yt_url=yt_url)
         if not video:
             raise Exception(f"Video w/ url {yt_url} doesn't exist")
 
-        response, text = agent.vision_agent(
+        response, text = vision_agent(
             db=db,
             video_id=video.id,
             user_input=user_input,
