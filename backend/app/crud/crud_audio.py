@@ -1,6 +1,6 @@
 from sqlalchemy import select, func, or_, and_
 from sqlalchemy.orm import Session
-from app.models import AudioText
+from models import AudioText
 
 
 class CRUDAudioText:

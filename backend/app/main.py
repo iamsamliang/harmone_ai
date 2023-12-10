@@ -1,18 +1,19 @@
-import sys
+import os
 import uuid
 import json
 from io import BytesIO
 from typing import Annotated
 
-from fastapi import FastAPI, Form, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Form, UploadFile, WebSocket, WebSocketDisconnect, Response, BackgroundTasks
 from fastapi import Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 import openai
 from openai.resources.audio.speech import HttpxBinaryResponseContent  # type: ignore
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-print(sys.path)
 
 from connection_manager import ConnectionManager
 from user import UserManager
@@ -31,32 +32,38 @@ app.add_middleware(
     CORSMiddleware, allow_origins=allowed_origins, allow_methods=["GET", "POST"]
 )
 
-# app.mount("/static", StaticFiles(directory="static"), name="static")
+if not os.path.exists("static"):
+    os.makedirs("static")
+if not os.path.exists("video-static"):
+    os.makedirs("video-static")
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 manager = ConnectionManager()
 user = UserManager()
+
 
 ### Testing with this URL from YouTube: https://www.youtube.com/watch?v=LQb8dK4MC-E&t=2s
 
 
 @app.get("/")
 async def home():
-    return {"data": "success"}
+    return {"data": "", "msg": "success", "code": 0}
 
 
-@app.post("/user")
+@app.post("/hapi/user")
 async def create_user(
-    db: Annotated[Session, Depends(get_db)], user_data: UserCreateRequest
+        db: Annotated[Session, Depends(get_db)], user_data: UserCreateRequest
 ):
     try:
-        crud_user.create(
+        user = crud_user.user.create(
             db=db,
             email=user_data.email,
             first_name=user_data.first_name,
             last_name=user_data.last_name,
         )
         db.commit()
-        return {"data": "success"}
+        return {"data": user.id, "msg": "success", "code": 0}
     except IntegrityError as e:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -64,23 +71,27 @@ async def create_user(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@app.get("/user/{id}")
+@app.get("/hapi/user/{id}")
 async def get_user(db: Annotated[Session, Depends(get_db)], id: int):
-    user = crud_user.get(db=db, id=id)
+    user = crud_user.user.get(db=db, id=id)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User w/ id {id} doesn't exist",
         )
     return {
-        "id": user.id,
-        "email": user.email,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
+        "code": 0,
+        "msg": "success",
+        "data": {
+            "id": user.id,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
     }
 
 
-@app.get("/client_id")
+@app.get("/hapi/client_id")
 async def get_id():
     u = uuid.uuid4()
     print(user.get(str(u)))
@@ -90,11 +101,11 @@ async def get_id():
     res = {}
     res["code"] = 0
     res["msg"] = "success"
-    res["data"] = u
-    return res
+    res["data"] = u.__str__()
+    return JSONResponse(content=res, status_code=200)
 
 
-@app.get("/email")
+@app.get("/hapi/email")
 async def email(client_id: str, email: str):
     ret = user.append(client_id, "email", email)
     res = {}
@@ -114,14 +125,14 @@ class Extract(BaseModel):
     client_id: str
 
 
-@app.post("/url", status_code=status.HTTP_204_NO_CONTENT)
+@app.post("/hapi/url")
 async def extract_url(db: Annotated[Session, Depends(get_db)], request: Extract):
     history_list = user.get_history(request.client_id)
     # 这是当前用户的历史消息
     print(history_list)
 
     try:
-        utils.pipeline(db=db, yt_url=request.yt_url)
+        video = pipeline(db=db, yt_url=request.yt_url)
         db.commit()
         chat = Chat(
             chat_id=str(uuid.uuid4()), role="user", content=request.yt_url, is_url=True
@@ -135,16 +146,20 @@ async def extract_url(db: Annotated[Session, Depends(get_db)], request: Extract)
     except IntegrityError as e:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
+    res = {}
+    res["code"] = 0
+    res["msg"] = "success"
+    res["data"] = video
+    return res
 
 async def say_to_ai(
-    db: Session,
-    file: bytes,
-    client_id: str,
-    yt_url: str,
-    end_sec: int,
-    context_len: int = 10,
-    reactor: str = "iShowSpeed",
+        db: Session,
+        file: bytes,
+        client_id: str,
+        yt_url: str,
+        end_sec: int,
+        context_len: int = 10,
+        reactor: str = "iShowSpeed",
 ) -> tuple[HttpxBinaryResponseContent, str]:
     # end_sec is the time in the video when the user started talking. Needs to be converted to seconds
     # round to the nearest second, using round() function
@@ -208,15 +223,21 @@ async def say_to_ai(
         raise Exception
 
 
-@app.websocket("/ws/{client_id}")
+@app.websocket("/hapi/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):
     await manager.connect(client_id, websocket)
+    coro = manager.send_personal_message(id=client_id, message="Welcome to the chat")
+    await coro
     try:
         while True:
             # Receive the JSON text message first
             print("waiting to receive data")
             text_data = await websocket.receive_text()
             timestamp_data = json.loads(text_data)
+            if timestamp_data.get("action") == "test":
+                coro = manager.send_personal_message(id=client_id, message=json.dumps({"action": "test", "data": "http://localhost:8089/static/356596524.mp3"}))
+                await coro
+                continue
             end_sec = round(timestamp_data.get("timestamp"))
             yt_url = timestamp_data.get("ytUrl")
             print(end_sec)
@@ -272,4 +293,5 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8089)

@@ -12,7 +12,7 @@ class ConnectionManager:
     def disconnect(self, id: str):
         del self.active_connection[id]
 
-    async def send_personal_message(self, id: str, message: str):
+    async def send_personal_message(self, id: str, message: str) -> None:
         websocket = self.active_connection[id]
         await websocket.send_text(message)
 

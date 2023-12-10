@@ -16,13 +16,17 @@ def audio_to_text(audio_file: str):
 
     # english only model for speed
 
-    client = OpenAI()
+    try:
+        client = OpenAI()
 
-    audio = open(audio_file, "rb")
+        audio = open(audio_file, "rb")
 
-    transcript = client.audio.transcriptions.create(
-        model="whisper-1", file=audio, language="en", response_format="verbose_json"
-    )
+        transcript = client.audio.transcriptions.create(
+            model="whisper-1", file=audio, language="en", response_format="verbose_json"
+        )
+    except OpenAI.OpenAIError as e:
+        print(e)
+        return False
 
     # model = whisper.load_model("base.en", device=device_n)
     # result = model.transcribe(audio_file)  # mp3 or webm

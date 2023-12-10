@@ -5,7 +5,7 @@ import openai
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app import crud
+from crud import crud_frame, crud_audio as crud_audiotext
 
 
 def vision_agent(
@@ -27,7 +27,7 @@ def vision_agent(
     load_dotenv()
 
     start_sec = max(1, end_sec - context_len)
-    frames_context = crud.frame.get(
+    frames_context = crud_frame.get(
         db=db, video_id=video_id, start_sec=start_sec, end_sec=end_sec
     )
     if not frames_context:
@@ -42,7 +42,7 @@ def vision_agent(
             # Encode the image to base64 strings and replace
             frames_context[idx] = encode_image(file_path)
 
-    res = crud.audiotext.get(
+    res = crud_audiotext.get(
         db=db, video_id=video_id, start_sec=start_sec, end_sec=end_sec
     )
     if not res:

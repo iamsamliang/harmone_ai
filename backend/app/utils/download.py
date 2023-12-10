@@ -10,11 +10,13 @@ def dl_video_audio(url, vid_file, audio_file):
 
         ### download the video and audio separately
         download_command = f'yt-dlp -f bestaudio -o "{audio_file}.%(ext)s" {url} && yt-dlp -f bestvideo -o "{vid_file}.%(ext)s" {url}'
-        subprocess.run(download_command, shell=True, check=True)
+        completed_process = subprocess.run(download_command, shell=True, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return_code = completed_process.returncode
+        print(f"返回码: {return_code}")
+        return True
     except subprocess.CalledProcessError as e:
         print(f"Failed to download video: {e}")
-        return None
-
+    return False
 
 def extract_vid_info(url):
     # extract video information

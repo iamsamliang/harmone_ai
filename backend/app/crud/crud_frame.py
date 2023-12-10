@@ -4,7 +4,7 @@ from typing import Sequence
 from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
 
-from app.models import Frame
+from models import Frame
 
 
 class CRUDFrame:

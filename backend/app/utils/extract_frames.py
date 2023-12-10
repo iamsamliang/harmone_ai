@@ -14,4 +14,7 @@ def extract_frames(video_path, output_dir):
 
     # this command is more accurate
     command = f"ffmpeg -i {video_path} -vf fps=1 {output_dir}/image_%04d.jpg"
-    subprocess.run(command, shell=True, check=True)
+    completed_process = subprocess.run(command, shell=True, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return_code = completed_process.returncode
+    print(f"返回码: {return_code}")
+    return True
