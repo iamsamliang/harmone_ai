@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "yt-ai"
+version = "0.1.0"
+description = ""
+license = "Proprietary"
+authors = ["Sam Liang <iamsamliang8@gmail.com>"]
+readme = "../README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "~3.11.6"
+datasets = "2.14.6"
+fastapi = "0.104.1"
+langchain = "0.0.335"
+openai = "1.2.4"
+opencv-python = "4.8.1.78"
+python-dotenv = "1.0.0"
+pytube = "15.0.0"
+requests = "2.31.0"
+sqlalchemy = "2.0.23"
+transformers = "4.34.0"
+uvicorn = "0.24.0.post1"
+sqlalchemy-cockroachdb = "^2.0.1"
+psycopg2 = "^2.9.9"
+python-multipart = "^0.0.6"
+yt-dlp = "^2023.11.16"
+pydantic = {extras = ["email"], version = "^2.5.1"}
+websockets = "^12.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

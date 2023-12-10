@@ -5,8 +5,7 @@ import openai
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from crud import crud_audio as audiotext, crud_frame as frame
-
+from crud import crud_frame, crud_audio as crud_audiotext
 
 def vision_agent(
     db: Session,
@@ -27,7 +26,7 @@ def vision_agent(
     load_dotenv()
 
     start_sec = max(1, end_sec - context_len)
-    frames_context = frame.get(
+    frames_context = crud_frame.get(
         db=db, video_id=video_id, start_sec=start_sec, end_sec=end_sec
     )
     if not frames_context:
@@ -42,7 +41,7 @@ def vision_agent(
             # Encode the image to base64 strings and replace
             frames_context[idx] = encode_image(file_path)
 
-    res = audiotext.get(
+    res = crud_audiotext.get(
         db=db, video_id=video_id, start_sec=start_sec, end_sec=end_sec
     )
     if not res:
@@ -72,16 +71,6 @@ def vision_agent(
     result = openai.chat.completions.create(**params)
     text = result.choices[0].message.content
 
-    response = openai.audio.speech.create(
-        model="tts-1",
-        voice="nova",
-        input=text,
-    )
+    response = openai.audio.speech.create(model="tts-1", voice="nova", input=text)
 
-    return response
-
-
-user_input = "nothing"
-reactor = "IShowSpeed"
-context_len = 2  # defined in seconds
-end_sec = max(2, 238)
+    return response, text
