@@ -57,7 +57,7 @@ async function main() {
                 return
             }
             if (res && res.data) {
-                // obj.soundQueue.push(res.data)
+                obj.soundQueue.push(res.data)
             }
         }
     })
