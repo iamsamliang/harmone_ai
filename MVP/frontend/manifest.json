@@ -1,0 +1,10 @@
+{
+  "name": "Harmone frontend",
+  "version": "1.0.0",
+  "description": "Harmone AI",
+  "manifest_version": 3,
+  "author": "CH",
+  "action": {
+    "default_popup": "index.html"
+  }
+}

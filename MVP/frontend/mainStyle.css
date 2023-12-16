@@ -1,0 +1,95 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 500px; 
+    width: 400px; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f4; 
+}
+
+.app-bar {
+    background-color: #343a40; 
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-container {
+    padding: 10px;
+    height: calc(100% - 90px); 
+    overflow-y: auto;
+}
+
+.scrollable-content {
+    background: #ffffff; 
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+}
+
+.placeholder {
+    background-color: #dee2e6; 
+    height: 100px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.talk-button {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 15px 0;
+    background-color: #495057;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-top: 1px solid #343a40; 
+}
+
+.talk-button:hover {
+    background-color: #343a40; 
+}
+.placeholder {
+    display: flex;
+    align-items: center;
+    background-color: #dee2e6;
+    height: 100px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.profile-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #adb5bd; 
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.placeholder-text {
+    flex-grow: 1;
+}
+
+.placeholder-name {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.placeholder-creator {
+    font-size: 14px;
+    color: #6c757d; 
+}
+
+.checkbox-container {
+    margin-left: 10px;
+}
+
+.checkbox {
+    cursor: pointer;
+    transform: scale(1.5); 
+}
